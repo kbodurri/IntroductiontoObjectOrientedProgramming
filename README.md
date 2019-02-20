@@ -24,7 +24,7 @@ For more information please visit -> [Wiki Course](https://courses.e-ce.uth.gr/C
 # Contributors & Communication
 * [Klajdi Bodurri](https://github.com/kbodurri) - kbontourri@gmail.com
 	
-* [Put the name here](github account here) - your email.
+* [Eirini Tsitsopoulou](https://github.com/eirini5th) - etsitsopl@gmail.com
 
 
 
