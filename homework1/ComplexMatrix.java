@@ -132,6 +132,43 @@ public class ComplexMatrix {
         updateArray(newComplexArray, matrix.getDimRow(), matrix.getDimCol());
     }
 
+    public ComplexMatrix subMatrix(int delRow, int delCol) {
+        // check first if subMatrix is not allowed
+        if (delRow < 0 || delRow >= dimRow || delCol < 0 || delCol >= dimCol){
+            return null;
+        }
+
+        ComplexMatrix trimmedMatrix = new ComplexMatrix(dimRow-1, dimCol-1);
+
+        int i, j, rowIndex=0, colIndex=0;
+        
+        /* rowIndex and colIndex gives the index of trimmedArray in which each 
+         * element of the complexArray should be stored.
+        */ 
+        for (i=0; i<dimRow; i++) {
+            
+            colIndex = 0;
+            
+            if (i == delRow) { // skip this row
+                continue;
+            }
+
+            for (j=0; j<dimCol; j++) {
+                if (j == delCol) { // skip this column
+                    continue;
+                }
+
+                // copy the elements to the new matrix
+                trimmedMatrix.setElement(rowIndex, colIndex, complexArray[i][j]);
+                colIndex++;  
+            }
+
+            rowIndex++;
+        }
+        
+        return trimmedMatrix;
+    }
+
     // Return the number of complexArray[rowIndex][colIndex]
     public double getElement(int rowIndex, int colIndex) {
         return complexArray[rowIndex][colIndex];
@@ -200,12 +237,15 @@ public class ComplexMatrix {
     // HERE YOU CAN DO YOUR TESTS OF THE CLASS
     public static void main(String[] args) {
         RandomGenerator rg = new RandomGenerator(6);
-        ComplexMatrix complexMatrixObject1 = new ComplexMatrix(2, 2, rg);
+        ComplexMatrix complexMatrixObject1 = new ComplexMatrix(3, 3, rg);
+        ComplexMatrix complexMatrixObject2 = complexMatrixObject1.subMatrix(0,1);
         System.out.println(complexMatrixObject1.toString());
-        
-        ComplexMatrix complexMatrixObject2 = new ComplexMatrix(2, 1, rg);
-        System.out.println(complexMatrixObject2.toString());
-        
-        System.out.println(complexMatrixObject1.multiply(complexMatrixObject2).toString());
-    }
+
+        if (complexMatrixObject2 != null){
+            System.out.println(complexMatrixObject2.toString());
+        }
+        else {
+            System.out.println("You can't do subMatrix");
+        }
+  }
 }
