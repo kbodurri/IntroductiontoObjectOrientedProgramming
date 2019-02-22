@@ -93,6 +93,29 @@ public class ComplexMatrix {
         return null;
     }
 
+    // Multiplication of complexArray and matrix.
+    public ComplexMatrix multiply(ComplexMatrix matrix) {
+        ComplexMatrix resultComplexMatrix = new ComplexMatrix(dimRow, matrix.getDimCol());
+        int i,j,k;
+        double tmp_number, product;
+
+        if (dimCol == matrix.getDimRow()) { // check if the product of two matrices can be done
+            for (i=0; i<dimRow; i++){ // rows of complexArray
+                for (j=0; j<matrix.getDimCol(); j++) { // columns of matrix
+                    resultComplexMatrix.setElement(i,j, 0.0);
+                    for (k=0; k<dimCol; k++){
+                        // C[i][j] += A[i][k]*B[k][j]
+                        tmp_number = resultComplexMatrix.getElement(i, j);
+                        product = complexArray[i][k]*matrix.getElement(k,j);
+                        resultComplexMatrix.setElement(i,j, tmp_number+product);
+                    }
+                } 
+            }
+            return resultComplexMatrix;
+        }
+        return null;
+    }
+
     // assign the matrix to the complexArray.
     public void assign(ComplexMatrix matrix) {
         double [][] newComplexArray = new double[matrix.getDimRow()][matrix.getDimCol()];
@@ -177,13 +200,12 @@ public class ComplexMatrix {
     // HERE YOU CAN DO YOUR TESTS OF THE CLASS
     public static void main(String[] args) {
         RandomGenerator rg = new RandomGenerator(6);
-        ComplexMatrix complexMatrixObject1 = new ComplexMatrix(5, 5, rg);
+        ComplexMatrix complexMatrixObject1 = new ComplexMatrix(2, 2, rg);
         System.out.println(complexMatrixObject1.toString());
         
-        ComplexMatrix complexMatrixObject2 = new ComplexMatrix(2, 2, rg);
+        ComplexMatrix complexMatrixObject2 = new ComplexMatrix(2, 1, rg);
+        System.out.println(complexMatrixObject2.toString());
         
-        complexMatrixObject1.assign(complexMatrixObject2);
-        
-        System.out.println(complexMatrixObject1.toString());
+        System.out.println(complexMatrixObject1.multiply(complexMatrixObject2).toString());
     }
 }
