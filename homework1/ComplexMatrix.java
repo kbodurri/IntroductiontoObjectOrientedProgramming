@@ -57,63 +57,66 @@ public class ComplexMatrix {
 
     // Addition of complexArray and matrix. Returns a new ComplexMatrix object.
     public ComplexMatrix add(ComplexMatrix matrix) {
+        // check if the addition cannot be done
+        if (dimRow != matrix.getDimRow() || dimCol != matrix.getDimCol()){
+            return null;
+        } 
+
         ComplexMatrix resultComplexMatrix = new ComplexMatrix(matrix.getDimRow(), matrix.getDimCol());
 
         int i,j;
 
         // check if the addition between the 2 matrices can be done.
-        if (dimRow == matrix.getDimRow() && dimCol == matrix.getDimCol()) {
-            for (i=0; i<dimRow; i++) { // do the addition 
-                for (j=0; j<dimCol; j++) {
-                    resultComplexMatrix.setElement(i, j, complexArray[i][j] + matrix.getElement(i, j));
-                }
+        for (i=0; i<dimRow; i++) { // do the addition 
+            for (j=0; j<dimCol; j++) {
+                resultComplexMatrix.setElement(i, j, complexArray[i][j] + matrix.getElement(i, j));
             }
-            return resultComplexMatrix;
         }
-
-        return null;
+        return resultComplexMatrix;
     }
 
     // Subtraction of complexArray and matrix. Returns a new ComplexMatrix object.
     public ComplexMatrix subtrack(ComplexMatrix matrix) {
+        // check if the subtraction cannot be done
+        if (dimRow != matrix.getDimRow() || dimCol != matrix.getDimCol()){
+            return null;
+        } 
+
         ComplexMatrix resultComplexMatrix = new ComplexMatrix(matrix.getDimRow(), matrix.getDimCol());
 
         int i,j;
 
-        // check if the subtraction between the 2 matrices can be done.
-        if (dimRow == matrix.getDimRow() && dimCol == matrix.getDimCol()) {
-            for (i=0; i<dimRow; i++) { // do the subtraction 
-                for (j=0; j<dimCol; j++) {
-                    resultComplexMatrix.setElement(i, j, complexArray[i][j] - matrix.getElement(i, j));
-                }
+        for (i=0; i<dimRow; i++) { // do the subtraction 
+            for (j=0; j<dimCol; j++) {
+                resultComplexMatrix.setElement(i, j, complexArray[i][j] - matrix.getElement(i, j));
             }
-            return resultComplexMatrix;
         }
-
-        return null;
+        return resultComplexMatrix;
     }
 
     // Multiplication of complexArray and matrix.
     public ComplexMatrix multiply(ComplexMatrix matrix) {
+        // check if multiplication of two matrices cannot be done.
+        if (dimCol != matrix.getDimRow()) {
+            return null;
+        }
+
         ComplexMatrix resultComplexMatrix = new ComplexMatrix(dimRow, matrix.getDimCol());
         int i,j,k;
         double tmp_number, product;
 
-        if (dimCol == matrix.getDimRow()) { // check if the product of two matrices can be done
-            for (i=0; i<dimRow; i++){ // rows of complexArray
-                for (j=0; j<matrix.getDimCol(); j++) { // columns of matrix
-                    resultComplexMatrix.setElement(i,j, 0.0);
-                    for (k=0; k<dimCol; k++){
-                        // C[i][j] += A[i][k]*B[k][j]
-                        tmp_number = resultComplexMatrix.getElement(i, j);
-                        product = complexArray[i][k]*matrix.getElement(k,j);
-                        resultComplexMatrix.setElement(i,j, tmp_number+product);
-                    }
-                } 
-            }
-            return resultComplexMatrix;
+        for (i=0; i<dimRow; i++){ // rows of complexArray
+            for (j=0; j<matrix.getDimCol(); j++) { // columns of matrix
+                resultComplexMatrix.setElement(i,j, 0.0);
+                for (k=0; k<dimCol; k++){
+                    // C[i][j] += A[i][k]*B[k][j]
+                    tmp_number = resultComplexMatrix.getElement(i, j);
+                    product = complexArray[i][k]*matrix.getElement(k,j);
+                    resultComplexMatrix.setElement(i,j, tmp_number+product);
+                }
+            } 
         }
-        return null;
+        return resultComplexMatrix;
     }
 
     // assign the matrix to the complexArray.
