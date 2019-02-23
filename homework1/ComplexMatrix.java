@@ -3,11 +3,13 @@
  * A class that describes basic operations on complex number matrices.
  * Operations such as add, subtract, multiply of two complex matrices.
  * Also supports subMatrix which deletes one row and one column from the
- * complex matrix and finally calculation of determinat of the complex matrix.
+ * complex matrix and finally calculation of determinant of the complex matrix.
  *
  * Contributors : Klajdi Bodurri and Eirini Tsitsopoulou.
  *
 */
+
+import java.lang.Math;
 
 public class ComplexMatrix {
     
@@ -172,6 +174,31 @@ public class ComplexMatrix {
         return trimmedMatrix;
     }
 
+    public double determinant() {
+        // if the complexArray is not squared.
+        if (dimRow != dimCol) {
+            return -0.0001; // WE SHOULD CHANGE IT TO NULL!!!
+        }
+
+        ComplexMatrix tmpMatrix;
+        double result=0.0;
+        int i,j;
+
+        if (dimRow == 2) { // determinant of a 2x2 array.
+            // a*d - c*b
+            result = (complexArray[0][0]*complexArray[1][1]) - complexArray[0][1]*
+                complexArray[1][0];
+        }
+        else { // calculate determinant recursively
+            for (i=0; i<dimRow; i++) {
+                tmpMatrix = subMatrix(0,i);
+                result = result + ((Math.pow(-1, i)*complexArray[0][i])*tmpMatrix.determinant());
+            }
+        }
+
+        return result;
+    }
+
     // Return the number of complexArray[rowIndex][colIndex]
     public double getElement(int rowIndex, int colIndex) {
         return complexArray[rowIndex][colIndex];
@@ -240,15 +267,9 @@ public class ComplexMatrix {
     // HERE YOU CAN DO YOUR TESTS OF THE CLASS
     public static void main(String[] args) {
         RandomGenerator rg = new RandomGenerator(6);
-        ComplexMatrix complexMatrixObject1 = new ComplexMatrix(3, 3, rg);
-        ComplexMatrix complexMatrixObject2 = complexMatrixObject1.subMatrix(0,1);
+        ComplexMatrix complexMatrixObject1 = new ComplexMatrix(4, 4, rg);
         System.out.println(complexMatrixObject1.toString());
+        System.out.println(complexMatrixObject1.determinant());
 
-        if (complexMatrixObject2 != null){
-            System.out.println(complexMatrixObject2.toString());
-        }
-        else {
-            System.out.println("You can't do subMatrix");
-        }
   }
 }
