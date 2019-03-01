@@ -12,23 +12,25 @@
 import java.lang.Math;
 
 public class ComplexMatrix {
-    
+
     // dimensions of the complexArray
     private int dimRow, dimCol;
 
-    // complexArray is a an array that keeps the complex numbers. 
-    private double [][] complexArray;
+    // complexArray is a an array that keeps the complex numbers.
+    private ComplexNumber [][] complexArray;
 
     // A constructor that creates and initializes a complex array
-    ComplexMatrix(int rows, int cols, RandomGenerator rg) { 
-        this(rows, cols);  
+    ComplexMatrix(int rows, int cols, RandomGenerator rg) {
+        this(rows, cols);
 
         int i,j;
-
+        double realPart = rg.getDouble();
+        double imagPart = rg.getDouble();
         // initiliaze the complexArray
         for (i=0; i<rows; i++) {
             for (j=0; j<cols; j++) {
-                complexArray[i][j] = rg.getDouble();
+                complexArray[i][j] = new ComplexNumber(realPart, imagPart);
+
             }
         }
     }
@@ -40,7 +42,7 @@ public class ComplexMatrix {
         dimRow = rows;
         dimCol = cols;
 
-        complexArray = new double[rows][cols];
+        complexArray = new ComplexNumber[rows][cols];
     }
 
     // A constructor that creates and copies a complexMatrix to another.
@@ -55,42 +57,45 @@ public class ComplexMatrix {
                 complexArray[i][j] = original.getElement(i,j);
             }
         }
-    } 
+    }
 
     // Addition of complexArray and matrix. Returns a new ComplexMatrix object.
     public ComplexMatrix add(ComplexMatrix matrix) {
         // check if the addition cannot be done
         if (dimRow != matrix.getDimRow() || dimCol != matrix.getDimCol()){
             return null;
-        } 
+        }
 
         ComplexMatrix resultComplexMatrix = new ComplexMatrix(matrix.getDimRow(), matrix.getDimCol());
 
         int i,j;
 
         // check if the addition between the 2 matrices can be done.
-        for (i=0; i<dimRow; i++) { // do the addition 
+        for (i=0; i<dimRow; i++) { // do the addition
             for (j=0; j<dimCol; j++) {
-                resultComplexMatrix.setElement(i, j, complexArray[i][j] + matrix.getElement(i, j));
+                resultComplexMatrix.setElement(i, j, complexArray[i][j].add(matrix.getElement(i, j)));
+                //   public ComplexNumber add(ComplexNumber num){
+                //     cnum3 = cnum1.add(cnum2);
+
             }
         }
         return resultComplexMatrix;
     }
 
     // Subtraction of complexArray and matrix. Returns a new ComplexMatrix object.
-    public ComplexMatrix subtrack(ComplexMatrix matrix) {
+    public ComplexMatrix subtract(ComplexMatrix matrix) {
         // check if the subtraction cannot be done
         if (dimRow != matrix.getDimRow() || dimCol != matrix.getDimCol()){
             return null;
-        } 
+        }
 
         ComplexMatrix resultComplexMatrix = new ComplexMatrix(matrix.getDimRow(), matrix.getDimCol());
 
         int i,j;
 
-        for (i=0; i<dimRow; i++) { // do the subtraction 
+        for (i=0; i<dimRow; i++) { // do the subtraction
             for (j=0; j<dimCol; j++) {
-                resultComplexMatrix.setElement(i, j, complexArray[i][j] - matrix.getElement(i, j));
+                resultComplexMatrix.setElement(i, j, complexArray[i][j].subtract(matrix.getElement(i, j)));
             }
         }
         return resultComplexMatrix;
@@ -105,25 +110,27 @@ public class ComplexMatrix {
 
         ComplexMatrix resultComplexMatrix = new ComplexMatrix(dimRow, matrix.getDimCol());
         int i,j,k;
-        double tmp_number, product;
+        ComplexNumber tmp_number, product;
+        ComplexNumber zero = new ComplexNumber(0.0, 0.0);
 
         for (i=0; i<dimRow; i++){ // rows of complexArray
             for (j=0; j<matrix.getDimCol(); j++) { // columns of matrix
-                resultComplexMatrix.setElement(i,j, 0.0);
+
+                resultComplexMatrix.setElement(i,j, zero);
                 for (k=0; k<dimCol; k++){
                     // C[i][j] += A[i][k]*B[k][j]
                     tmp_number = resultComplexMatrix.getElement(i, j);
-                    product = complexArray[i][k]*matrix.getElement(k,j);
-                    resultComplexMatrix.setElement(i,j, tmp_number+product);
+                    product = complexArray[i][k].multiply(matrix.getElement(k,j));
+                    resultComplexMatrix.setElement(i,j, tmp_number.add(product));
                 }
-            } 
+            }
         }
         return resultComplexMatrix;
     }
 
     // assign the matrix to the complexArray.
     public void assign(ComplexMatrix matrix) {
-        double [][] newComplexArray = new double[matrix.getDimRow()][matrix.getDimCol()];
+        ComplexNumber [][] newComplexArray = new ComplexNumber[matrix.getDimRow()][matrix.getDimCol()];
         int i,j;
 
         // copies the matrix into to newComplexArray
@@ -146,14 +153,14 @@ public class ComplexMatrix {
         ComplexMatrix trimmedMatrix = new ComplexMatrix(dimRow-1, dimCol-1);
 
         int i, j, rowIndex=0, colIndex=0;
-        
-        /* rowIndex and colIndex gives the index of trimmedArray in which each 
+
+        /* rowIndex and colIndex gives the index of trimmedArray in which each
          * element of the complexArray should be stored.
-        */ 
+        */
         for (i=0; i<dimRow; i++) {
-            
+
             colIndex = 0;
-            
+
             if (i == delRow) { // skip this row
                 continue;
             }
@@ -165,34 +172,41 @@ public class ComplexMatrix {
 
                 // copy the elements to the new matrix
                 trimmedMatrix.setElement(rowIndex, colIndex, complexArray[i][j]);
-                colIndex++;  
+                colIndex++;
             }
 
             rowIndex++;
         }
-        
+
         return trimmedMatrix;
     }
 
-    public double determinant() {
+    public ComplexNumber determinant() {
         // if the complexArray is not squared.
         if (dimRow != dimCol) {
-            return -0.0001; // WE SHOULD CHANGE IT TO NULL!!!
+            ComplexNumber res = new ComplexNumber(-0.01, -0.01);
+            return res; //-0.0001; // WE SHOULD CHANGE IT TO NULL!!!
         }
 
         ComplexMatrix tmpMatrix;
-        double result=0.0;
+        ComplexNumber result = new ComplexNumber(0.0, 0.0);
+
+        ComplexNumber a_tms_d = new ComplexNumber(0.0, 0.0);
+        ComplexNumber c_tms_b = new ComplexNumber(0.0, 0.0);
+
         int i,j;
 
         if (dimRow == 2) { // determinant of a 2x2 array.
             // a*d - c*b
-            result = (complexArray[0][0]*complexArray[1][1]) - complexArray[0][1]*
-                complexArray[1][0];
+            a_tms_d = complexArray[0][0].multiply(complexArray[1][1]);
+            c_tms_b = complexArray[0][1].multiply(complexArray[1][0]);
+            result = a_tms_d.subtract(c_tms_b);
         }
         else { // calculate determinant recursively
             for (i=0; i<dimRow; i++) {
+                ComplexNumber one_tt_power = new ComplexNumber(Math.pow(-1, i), 0.0);
                 tmpMatrix = subMatrix(0,i);
-                result = result + ((Math.pow(-1, i)*complexArray[0][i])*tmpMatrix.determinant());
+                result = result.add((one_tt_power.multiply(complexArray[0][i])).multiply(tmpMatrix.determinant()));
             }
         }
 
@@ -200,12 +214,12 @@ public class ComplexMatrix {
     }
 
     // Return the number of complexArray[rowIndex][colIndex]
-    public double getElement(int rowIndex, int colIndex) {
+    public ComplexNumber getElement(int rowIndex, int colIndex) {
         return complexArray[rowIndex][colIndex];
     }
 
     // Sets the complexArray[rowIndex][colIndex] to a number
-    public void setElement(int rowIndex, int colIndex, double number) {
+    public void setElement(int rowIndex, int colIndex, ComplexNumber number) {
         complexArray[rowIndex][colIndex] = number;
     }
 
@@ -220,7 +234,7 @@ public class ComplexMatrix {
     }
 
     // updates the complexArray and its dimensionality
-    private void updateArray(double newComplexArray[][], int rows, int cols) {
+    private void updateArray(ComplexNumber newComplexArray[][], int rows, int cols) {
         complexArray = newComplexArray;
         updateDimRow(rows);
         updateDimCol(cols);
@@ -240,7 +254,7 @@ public class ComplexMatrix {
     public String toString() {
         String arrayContents = "[";
         int i, j;
-        
+
         /* iterate through complexArray and convert the contents of the array to
         * a string.
         */
@@ -248,7 +262,7 @@ public class ComplexMatrix {
             for(j=0; j<dimCol; j++){
                 arrayContents = arrayContents + String.format("%.2f", complexArray[i][j]);
 
-                /* add comma to the end of each complex number except for the 
+                /* add comma to the end of each complex number except for the
                 * last one.
                 */
                 if (j != dimCol - 1){
