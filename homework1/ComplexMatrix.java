@@ -24,11 +24,12 @@ public class ComplexMatrix {
         this(rows, cols);
 
         int i,j;
-        double realPart = rg.getDouble();
-        double imagPart = rg.getDouble();
+        double realPart, imagPart;
         // initiliaze the complexArray
         for (i=0; i<rows; i++) {
             for (j=0; j<cols; j++) {
+                realPart = rg.getDouble();
+                imagPart = rg.getDouble();
                 complexArray[i][j] = new ComplexNumber(realPart, imagPart);
 
             }
@@ -184,12 +185,13 @@ public class ComplexMatrix {
     public ComplexNumber determinant() {
         // if the complexArray is not squared.
         if (dimRow != dimCol) {
-            ComplexNumber res = new ComplexNumber(-0.01, -0.01);
-            return res; //-0.0001; // WE SHOULD CHANGE IT TO NULL!!!
+            // ComplexNumber res = new ComplexNumber(-0.01, -0.01);
+            return null; //-0.0001; // WE SHOULD CHANGE IT TO NULL!!!
         }
 
         ComplexMatrix tmpMatrix;
         ComplexNumber result = new ComplexNumber(0.0, 0.0);
+        ComplexNumber one_tt_power = new ComplexNumber(0.0, 0.0);
 
         ComplexNumber a_tms_d = new ComplexNumber(0.0, 0.0);
         ComplexNumber c_tms_b = new ComplexNumber(0.0, 0.0);
@@ -204,7 +206,9 @@ public class ComplexMatrix {
         }
         else { // calculate determinant recursively
             for (i=0; i<dimRow; i++) {
-                ComplexNumber one_tt_power = new ComplexNumber(Math.pow(-1, i), 0.0);
+                one_tt_power.setReal(Math.pow(-1, i));
+                one_tt_power.setImag(0.0);
+
                 tmpMatrix = subMatrix(0,i);
                 result = result.add((one_tt_power.multiply(complexArray[0][i])).multiply(tmpMatrix.determinant()));
             }
@@ -260,7 +264,7 @@ public class ComplexMatrix {
         */
         for (i=0; i<dimRow; i++){
             for(j=0; j<dimCol; j++){
-                arrayContents = arrayContents + String.format("%.2f", complexArray[i][j]);
+                arrayContents = arrayContents + complexArray[i][j];
 
                 /* add comma to the end of each complex number except for the
                 * last one.
