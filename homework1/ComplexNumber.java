@@ -61,7 +61,7 @@ public class ComplexNumber {
   // Print ComplexNumber in format: Re +- |Im|j
   public String toString(){
     String str1 = String.format("%.2f", this.getReal());
-    String sign = (this.getImag() > 0) ? " + " : " - " ;
+    String sign = (this.getImag() >= 0) ? " + " : " - " ;
     String str2 = String.format("%.2f", Math.abs(this.getImag()));
 
     String str = str1 + sign + str2 + "j";
