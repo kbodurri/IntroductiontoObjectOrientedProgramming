@@ -19,8 +19,18 @@ public class ComplexMatrix {
     // complexArray is a an array that keeps the complex numbers.
     private ComplexNumber [][] complexArray;
 
+    // A constructor that creates a complex array
+    public ComplexMatrix(int rows, int cols) {
+        int i,j;
+
+        dimRow = rows;
+        dimCol = cols;
+
+        complexArray = new ComplexNumber[rows][cols];
+    }
+
     // A constructor that creates and initializes a complex array
-    ComplexMatrix(int rows, int cols, RandomGenerator rg) {
+    public ComplexMatrix(int rows, int cols, RandomGenerator rg) {
         this(rows, cols);
 
         int i,j;
@@ -36,18 +46,8 @@ public class ComplexMatrix {
         }
     }
 
-    // A constructor that creates a complex array
-    ComplexMatrix(int rows, int cols) {
-        int i,j;
-
-        dimRow = rows;
-        dimCol = cols;
-
-        complexArray = new ComplexNumber[rows][cols];
-    }
-
     // A constructor that creates and copies a complexMatrix to another.
-    ComplexMatrix(ComplexMatrix original) {
+    public ComplexMatrix(ComplexMatrix original) {
         this(original.getDimRow(), original.getDimCol());
 
         int i,j;
