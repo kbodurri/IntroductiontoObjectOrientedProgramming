@@ -8,8 +8,7 @@
  * Contributors : Klajdi Bodurri and Eirini Tsitsopoulou.
  *
 */
-
-import java.lang.Math;
+package ce325.hw1;
 
 public class ComplexMatrix {
 
@@ -28,7 +27,7 @@ public class ComplexMatrix {
 
         complexArray = new ComplexNumber[rows][cols];
     }
-
+    
     // A constructor that creates and initializes a complex array
     public ComplexMatrix(int rows, int cols, RandomGenerator rg) {
         this(rows, cols);
@@ -59,7 +58,7 @@ public class ComplexMatrix {
             }
         }
     }
-
+    
     // Addition of complexArray and matrix. Returns a new ComplexMatrix object.
     public ComplexMatrix add(ComplexMatrix matrix) {
         // check if the addition cannot be done
@@ -281,13 +280,4 @@ public class ComplexMatrix {
 
         return arrayContents;
     }
-
-    // HERE YOU CAN DO YOUR TESTS OF THE CLASS
-    public static void main(String[] args) {
-        RandomGenerator rg = new RandomGenerator(6);
-        ComplexMatrix complexMatrixObject1 = new ComplexMatrix(4, 4, rg);
-        System.out.println(complexMatrixObject1.toString());
-        System.out.println(complexMatrixObject1.determinant());
-
-  }
 }
