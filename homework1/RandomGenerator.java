@@ -1,3 +1,5 @@
+package ce325.hw1;
+
 /*
  * Random number Generator 
 */
