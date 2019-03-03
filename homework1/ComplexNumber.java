@@ -7,6 +7,7 @@
  * Contributors : Klajdi Bodurri and Eirini Tsitsopoulou.
  */
 
+package ce325.hw1;
 public class ComplexNumber {
   double real;
   double imag;
@@ -50,7 +51,7 @@ public class ComplexNumber {
   }
 
   // Multiply num by ComplexNumber and assign result to new ComplexNumber
-  ComplexNumber multiply(ComplexNumber num){
+  public ComplexNumber multiply(ComplexNumber num){
     ComplexNumber res;
     double res_real = this.getReal()*num.getReal() - this.getImag()*num.getImag();
     double res_imag = this.getReal()*num.getImag() + this.getImag()*num.getReal();
@@ -58,7 +59,7 @@ public class ComplexNumber {
     return res;
   }
 
-  // Print ComplexNumber in format: Re +- |Im|j
+  @Override // Print ComplexNumber in format: Re +- |Im|j
   public String toString(){
     String str1 = String.format("%.2f", this.getReal());
     String sign = (this.getImag() >= 0) ? " + " : " - " ;
