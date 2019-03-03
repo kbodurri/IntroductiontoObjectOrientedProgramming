@@ -277,7 +277,7 @@ public class ComplexMatrix {
         }
 
         //  trim the last \n and add the character ']'
-        arrayContents = arrayContents.trim() + "]";
+        arrayContents = arrayContents.trim() + "]\n";
 
         return arrayContents;
     }
