@@ -6,20 +6,30 @@
 */
 
 public class Node {
-    private int value;
+
+    private static int countObj = 0;
+    
+    private int id = 0;
+    private String value;
     private Node leftChild, rightChild;
 
     /* A constructor for Node class 
      * Sets the a new value to the node and inits childs with null
     */
-    public Node(int nodeValue) {
+    public Node(String nodeValue) {
         value = nodeValue;
         leftChild = null;
         rightChild = null;
+        id = countObj++; 
+    }
+
+    /* Returns the id of the node */
+    public int getID() {
+        return id;
     }
 
     /* Returns the value of the node */
-    public int getValue() {
+    public String getValue() {
         return value;
     }
 
