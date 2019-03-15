@@ -19,16 +19,17 @@ public class Tokenizer {
     }
 
     /*
-     * Returns the operator or the number (float or integer) from the position-th
+     * Returns the operator or the number (float or integer) from the i-th position
      * of the StringToToken.
     */
     private String getStringAt(int position) {
         Pattern floatPattern = Pattern.compile("[0-9]*\\.?[0-9]*");
-        Pattern operationPattern = Pattern.compile("[\\+\\-\\*\\(\\)\\^\\/]");
+        Pattern operationPattern = Pattern.compile("[\\+\\-\\*x\\(\\)\\^\\/]");
 
         Matcher operationMatcher = operationPattern.matcher(StringToToken.substring(position, position+1));
         Matcher floatMatcher = floatPattern.matcher(StringToToken);
 
+        // check if operation or float number
         if (operationMatcher.matches()) {
             return StringToToken.substring(position, position+1);
         }
@@ -38,7 +39,7 @@ public class Tokenizer {
         return null;
     }
     
-    // Converts the string from position-th into token.
+    // Converts the string from i-th position into token.
     private Token generateNextToken() {
         // end of string, return ENDOFSTRING token.
         if (position == StringToToken.length()) {

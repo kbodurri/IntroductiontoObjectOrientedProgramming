@@ -9,7 +9,7 @@ public class Token{
     public static final int OPERATOR = 0;
     public static final int NUMBER = 1;
     public static final int ENDOFSTRING = 2;
-    public static final String OPERATORS = "+-*x/()";
+    public static final String OPERATORS = "+-*x/()^";
 
     private int type;
     private String value = null;
@@ -23,10 +23,6 @@ public class Token{
         return value;
     }
     
-    public int getType() {
-        return type;
-    }
-
     // Checks whether the type is a number.
     public boolean isNumber() {
         if (type == NUMBER){
