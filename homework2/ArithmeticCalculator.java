@@ -1,10 +1,10 @@
-/* 
- * Implements the basic operations of an arithmetic calculator. Converts the 
+/*
+ * Implements the basic operations of an arithmetic calculator. Converts the
  * expression into math syntax tree. Supports in-order traversal through the tree.
  * Exports the tree in a proper form for graphiz. Lastly, calculates the arithmetic expression.
- * 
+ *
  * Contributors: Klajdi Bodurri && Eirini Tsitsopoulou.
-*/ 
+*/
 
 import java.util.*;
 import java.io.*;
@@ -14,6 +14,8 @@ public class ArithmeticCalculator {
 
     private String inputExpression;
 
+    private ExpressionCheck expCheck=null;
+
     // The parser of the expression
     private Tokenizer tokenizer=null;
 
@@ -22,13 +24,18 @@ public class ArithmeticCalculator {
 
     public ArithmeticCalculator(String newExpression) {
         inputExpression = newExpression;
+        expCheck = new ExpressionCheck(inputExpression);
         tokenizer = new Tokenizer(inputExpression);
     }
 
-    /* 
+    public boolean isValidExperssion(){
+      return (expCheck.isValid());
+    }
+
+    /*
      * Converts the expression to a binary tree.
      * Returns the tree as string in a proper form for graphiz.
-    */ 
+    */
     public String toDotString() {
         String graphvizString = "digraph ArithmeticExpressionTree {\nfontcolor=\""
             +"navy\";\nfontsize=20;\nlabelloc=\"t\";\nlabel=\"Arithmetic Expression\"\n";
@@ -57,14 +64,14 @@ public class ArithmeticCalculator {
         return LowPriority();
     }
 
-    // Checks if the current token is + or -. 
+    // Checks if the current token is + or -.
     private Node LowPriority() {
         Node node = null;
 
         // Check if the expression from the left is "*" or "x" or "/".
         Node leftExpression = mediumPriority();
         Token token = tokenizer.peekToken();
-    
+
         while (token.isOperator() && (token.getValue().equals("+") ||
                     token.getValue().equals("-"))) {
 
@@ -91,7 +98,7 @@ public class ArithmeticCalculator {
         Node leftExpression = highPriority();
         Token token = tokenizer.peekToken();
 
-        while (token.isOperator() && (token.getValue().equals("*") || 
+        while (token.isOperator() && (token.getValue().equals("*") ||
                     token.getValue().equals("x") || token.getValue().equals("/"))) {
 
             // we found the left child.
@@ -104,7 +111,7 @@ public class ArithmeticCalculator {
 
             // this node is the left subtree of the node that called it.
             leftExpression = node;
-            token = tokenizer.peekToken();     
+            token = tokenizer.peekToken();
         }
         return leftExpression;
     }
@@ -128,7 +135,7 @@ public class ArithmeticCalculator {
 
             // this node is the left subtree of the node that called it.
             leftExpression = node;
-            token = tokenizer.peekToken();     
+            token = tokenizer.peekToken();
         }
         return leftExpression;
     }
@@ -137,17 +144,17 @@ public class ArithmeticCalculator {
      * Checks if the current token is "(" or number.
      * Here is where the recursion happens because of "(".
      * Returns the root node of the subtree.
-    */ 
+    */
     private Node primaryExpression() {
         Node node = null;
         Token token = tokenizer.peekToken();
-    
+
         // The node recursion ends here becauses token is a number.
         if (token.isNumber()) {
             tokenizer.skipToken();
             node = new Node(token.getValue());
         }
-        else { // There is a subexpression inside parenthesis. 
+        else { // There is a subexpression inside parenthesis.
             if (token.getValue().equals("(")) {
                 tokenizer.skipToken();
                 node = expressionToTree();
@@ -167,7 +174,7 @@ public class ArithmeticCalculator {
         if (currentNode != null) {
             // get left child
             leftExpression = inOrderTraversaltoString(currentNode.getLeftChild());
-            
+
             // get right child
             rightExpression = inOrderTraversaltoString(currentNode.getRightChild());
 
@@ -185,7 +192,7 @@ public class ArithmeticCalculator {
     /*
      * Traverses the tree with in-order method and generates a string that can be
      * read by graphviz.
-    */ 
+    */
     private String inOrderTraversalGraphviz(Node currentNode) {
         String leftExpression = null;
         String rightExpression = null;
@@ -198,29 +205,29 @@ public class ArithmeticCalculator {
             rightExpression = inOrderTraversalGraphviz(currentNode.getRightChild());
             String currentNodeCircle = String.format("%d [label=\"%s\", shape=circle,"
                     +" color=black]\n", currentNode.getID(), currentNode.getValue());
-            
+
             if (leftExpression !=null && rightExpression != null){
                 // show the children of the current node
-                String leftChildConnection = String.format("%d -> %d\n", 
+                String leftChildConnection = String.format("%d -> %d\n",
                         currentNode.getID(), currentNode.getLeftChild().getID());
-                
+
                 String rightChildConnection = String.format("%d -> %d\n",
                         currentNode.getID(), currentNode.getRightChild().getID());
 
-                return leftExpression + rightExpression + currentNodeCircle + 
+                return leftExpression + rightExpression + currentNodeCircle +
                     leftChildConnection + rightChildConnection;
             }
             else {
                 return currentNodeCircle;
             }
         }
-        return null;       
-    } 
+        return null;
+    }
 
     /*
      * Traverses the tree with in-order method and calculates the result of the
      * expression.
-    */ 
+    */
     private Float inOrderTraversalResult(Node currentNode) {
         Float leftExpression = null;
         Float rightExpression = null;
@@ -231,7 +238,7 @@ public class ArithmeticCalculator {
 
             // second traverse the right child
             rightExpression = inOrderTraversalResult(currentNode.getRightChild());
-            
+
             if (leftExpression != null && rightExpression != null) {
                 // do the proper operation to the left and right child.
                 switch(currentNode.getValue()){
@@ -256,14 +263,23 @@ public class ArithmeticCalculator {
         Scanner sc = new Scanner(System.in);
         System.out.print("Enter expression: ");
         String expr = sc.nextLine();
+
         ArithmeticCalculator tree = new ArithmeticCalculator(expr);  // generate tree of nodes
+        if (tree.isValidExperssion()){
+          System.out.println("expression is valid, go on");
+        }
+        else{
+          System.out.println("expression is not a valid arithmetic expression, going to exit");
+          System.exit(1);
+        }
+
         System.out.println(tree.calculate());
-        try {        
+        try {
           PrintWriter pfile = new PrintWriter("ArithmeticExpression.dot");
           pfile.println(tree.toDotString());
           pfile.close();
           System.out.println("PRINT DOT FILE OK!");
-                 
+
           Process p = Runtime.getRuntime().exec("dot -Tpng ArithmeticExpression.dot “ + -o ArithmeticExpression.png");
           p.waitFor();
           System.out.println("PRINT PNG FILE OK!");
