@@ -3,11 +3,6 @@ import java.util.regex.Pattern;
 import java.lang.*;
 
 public class ExpressionCheck {
-    // java.util.Scanner sc = new java.util.Scanner(System.in);
-    // System.out.print("Enter math expression: ");
-    // String lineWithSpaces = sc.nextLine();
-    // System.out.println("Math expression is: "+lineWithSpaces);
-
     String lineWithSpaces = null;
 
     // constructor
@@ -39,7 +34,6 @@ public class ExpressionCheck {
           i--;
         }
       }
-      System.out.println("Math expression is (without spaces): "+line);
 
       // FASE 2: check for wrong placement of parentheses or all_operators
       for (int i = 0; i < line.length(); i++){
@@ -123,7 +117,6 @@ public class ExpressionCheck {
         return null;
       }
       else {
-        System.out.println("valid expression");
         return line.toString();
       }
 
