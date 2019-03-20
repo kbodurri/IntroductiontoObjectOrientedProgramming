@@ -32,6 +32,7 @@ public class ArithmeticCalculator {
         else{
           inputExpression = expr;
           tokenizer = new Tokenizer(inputExpression);
+          root = expressionToTree();
         }
 
     }
@@ -44,10 +45,6 @@ public class ArithmeticCalculator {
         String graphvizString = "digraph ArithmeticExpressionTree {\nfontcolor=\""
             +"navy\";\nfontsize=20;\nlabelloc=\"t\";\nlabel=\"Arithmetic Expression\"\n";
 
-        if (root == null){
-            root = expressionToTree();
-        }
-
         graphvizString = graphvizString + inOrderTraversalGraphviz(root) + "}";
         return graphvizString;
     }
@@ -56,11 +53,8 @@ public class ArithmeticCalculator {
         return inOrderTraversaltoString(root);
     }
 
-    public float calculate(){
-        if (root == null){
-            root = expressionToTree();
-        }
-        return inOrderTraversalResult(root).floatValue();
+    public double calculate(){
+        return inOrderTraversalResult(root).doubleValue();
     }
 
     // builds up the tree from the expression.
@@ -232,9 +226,9 @@ public class ArithmeticCalculator {
      * Traverses the tree with in-order method and calculates the result of the
      * expression.
     */
-    private Float inOrderTraversalResult(Node currentNode) {
-        Float leftExpression = null;
-        Float rightExpression = null;
+    private Double inOrderTraversalResult(Node currentNode) {
+        Double leftExpression = null;
+        Double rightExpression = null;
 
         if (currentNode != null) {
             // first traverse the left child
@@ -250,13 +244,13 @@ public class ArithmeticCalculator {
                     case "-": return leftExpression - rightExpression;
                     case "*": return leftExpression * rightExpression;
                     case "/": return leftExpression / rightExpression;
-                    case "^": return (float) Math.pow(leftExpression, rightExpression);
+                    case "^": return Math.pow(leftExpression, rightExpression);
                     default:
-                              return (float) 0.0;
+                              return 0.0;
                 }
             }
             else {
-                return Float.parseFloat(currentNode.getValue());
+                return Double.parseDouble(currentNode.getValue());
             }
 
         }
@@ -268,13 +262,9 @@ public class ArithmeticCalculator {
         System.out.print("Enter expression: ");
         String expr = sc.nextLine();
 
-        // String expr = exprCheck.validString();
-        // if (expr == null){
-        //   System.exit(1);
-        // }
-
         ArithmeticCalculator tree = new ArithmeticCalculator(expr);  // generate tree of nodes
-        System.out.println(tree.calculate());
+        System.out.println("Equivalent expression: " + tree.toString());
+        System.out.println("Expression result: " + tree.calculate());
         try {
           PrintWriter pfile = new PrintWriter("ArithmeticExpression.dot");
           pfile.println(tree.toDotString());
