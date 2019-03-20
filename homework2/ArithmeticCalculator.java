@@ -14,6 +14,8 @@ public class ArithmeticCalculator {
 
     private String inputExpression;
 
+    private ExpressionCheck exprCheck;
+
     // The parser of the expression
     private Tokenizer tokenizer=null;
 
@@ -22,7 +24,16 @@ public class ArithmeticCalculator {
 
     public ArithmeticCalculator(String newExpression) {
         inputExpression = newExpression;
-        tokenizer = new Tokenizer(inputExpression);
+        exprCheck = new ExpressionCheck(inputExpression);
+        String expr = exprCheck.validString();
+        if (expr == null){
+          System.exit(1);
+        }
+        else{
+          inputExpression = expr;
+          tokenizer = new Tokenizer(inputExpression);
+        }
+
     }
 
     /*
@@ -255,12 +266,12 @@ public class ArithmeticCalculator {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         System.out.print("Enter expression: ");
-        String exprScanned = sc.nextLine();
-        ExpressionCheck exprCheck = new ExpressionCheck(exprScanned);
-        String expr = exprCheck.validString();
-        if (expr == null){
-          System.exit(1);
-        }
+        String expr = sc.nextLine();
+
+        // String expr = exprCheck.validString();
+        // if (expr == null){
+        //   System.exit(1);
+        // }
 
         ArithmeticCalculator tree = new ArithmeticCalculator(expr);  // generate tree of nodes
         System.out.println(tree.calculate());
