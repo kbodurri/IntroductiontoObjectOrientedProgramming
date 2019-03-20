@@ -16,7 +16,7 @@ public class ExpressionCheck {
     }
 
     // isValid method
-    public boolean isValid(){
+    public String validString(){
       StringBuilder line = new StringBuilder(lineWithSpaces);
       // all operators: includes parentheses
       String all_operators = "+-x*/^.()";
@@ -31,7 +31,7 @@ public class ExpressionCheck {
         // check if there are invalid characters (anything other than numbers, all_operators and white spaces)
         if (!Character.isDigit(c) && (all_operators.indexOf(c) < 0) && !Character.isWhitespace(c)) {
           System.out.println("invalid");
-          return false;
+          return null;
         }
         // get rid of white spaces (will be needed for later)
         if (Character.isWhitespace(c)){
@@ -54,11 +54,11 @@ public class ExpressionCheck {
           if (operators.indexOf(c) >= 0){
             if (operators.indexOf(cPrev) >= 0){
               System.out.println("invalid");
-              return false;
+              return null;
             }
             if (operators.indexOf(cNext) >= 0){
               System.out.println("invalid");
-              return false;
+              return null;
             }
           }
         }
@@ -66,7 +66,7 @@ public class ExpressionCheck {
         else {
           if (operators.indexOf(c) >= 0){
             System.out.println("invalid");
-            return false;
+            return null;
           }
         }
 
@@ -77,7 +77,7 @@ public class ExpressionCheck {
           // invalid:   ...5(...
           if (i!=0 && all_operators.indexOf(line.charAt(i-1)) < 0 ){
             System.out.println("invalid");
-            return false;
+            return null;
           }
 
           // if there is operator right of left parentheses
@@ -85,7 +85,7 @@ public class ExpressionCheck {
           // invalid:   ...(+...
           if (i!=line.length()-1 && operators.indexOf(line.charAt(i+1)) >= 0 ){
             System.out.println("invalid");
-            return false;
+            return null;
           }
 
           if (done_par == 1) {
@@ -101,12 +101,12 @@ public class ExpressionCheck {
           // invalid:   ...)9...
           if (i!=line.length()-1 && all_operators.indexOf(line.charAt(i+1)) < 0 ){
             System.out.println("invalid");
-            return false;
+            return null;
           }
 
           if (i!=0 && operators.indexOf(line.charAt(i-1)) >= 0 ){
             System.out.println("invalid");
-            return false;
+            return null;
           }
 
           if (close == -1){
@@ -126,16 +126,16 @@ public class ExpressionCheck {
 
       if (open == 0 && close == -1){
         System.out.println("valid expression");
-        return true;
+        return line.toString();
       }
 
       else if (close != 0){
         System.out.println("invalid expression: wrong parentheses");
-        return false;
+        return null;
       }
       else {
         System.out.println("valid expression");
-        return true;
+        return line.toString();
       }
 
     }
