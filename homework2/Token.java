@@ -1,5 +1,5 @@
 /*
- * Describes basic struct of a token.
+ * Describes basic structure of a token.
  * 
  * Contributors: Klajdi Bodurri && Eirini Tsitsopoulou.
 */
@@ -18,7 +18,8 @@ public class Token{
         type = newType;
         value = newValue;
     }
-
+    
+    // returns the value of the token
     public String getValue() {
         return value;
     }
