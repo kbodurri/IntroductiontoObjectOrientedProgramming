@@ -3,6 +3,11 @@ import java.util.regex.Pattern;
 import java.lang.*;
 
 public class ExpressionCheck {
+    // java.util.Scanner sc = new java.util.Scanner(System.in);
+    // System.out.print("Enter math expression: ");
+    // String lineWithSpaces = sc.nextLine();
+    // System.out.println("Math expression is: "+lineWithSpaces);
+
     String lineWithSpaces = null;
 
     // constructor
@@ -17,7 +22,7 @@ public class ExpressionCheck {
       String all_operators = "+-x*/^.()";
       String operators = "+-x*/^.";
 
-      int open = 0, close = -1, done_par = 0;
+      int open = 0;
 
       // FASE 1: Getting rid of white space characters
       // and check for invalid characters
@@ -25,7 +30,7 @@ public class ExpressionCheck {
         char c = line.charAt(i);
         // check if there are invalid characters (anything other than numbers, all_operators and white spaces)
         if (!Character.isDigit(c) && (all_operators.indexOf(c) < 0) && !Character.isWhitespace(c)) {
-          System.out.println("invalid expression");
+          System.out.println("invalid");
           return null;
         }
         // get rid of white spaces (will be needed for later)
@@ -34,6 +39,7 @@ public class ExpressionCheck {
           i--;
         }
       }
+      System.out.println("Math expression is (without spaces): "+line);
 
       // FASE 2: check for wrong placement of parentheses or all_operators
       for (int i = 0; i < line.length(); i++){
@@ -47,11 +53,11 @@ public class ExpressionCheck {
           // operators next to it
           if (operators.indexOf(c) >= 0){
             if (operators.indexOf(cPrev) >= 0){
-              System.out.println("invalid expression");
+              System.out.println("invalid");
               return null;
             }
             if (operators.indexOf(cNext) >= 0){
-              System.out.println("invalid expression");
+              System.out.println("invalid");
               return null;
             }
           }
@@ -59,7 +65,7 @@ public class ExpressionCheck {
         // don't begin and don't end with an operator (other than parentheses)
         else {
           if (operators.indexOf(c) >= 0){
-            System.out.println("invalid expression");
+            System.out.println("invalid");
             return null;
           }
         }
@@ -70,7 +76,7 @@ public class ExpressionCheck {
           // e.g. valid: ...+(... or ...((...
           // invalid:   ...5(...
           if (i!=0 && all_operators.indexOf(line.charAt(i-1)) < 0 ){
-            System.out.println("invalid expression");
+            System.out.println("invalid");
             return null;
           }
 
@@ -78,15 +84,15 @@ public class ExpressionCheck {
           // e.g. valid: ...(5... or ...((...
           // invalid:   ...(+...
           if (i!=line.length()-1 && operators.indexOf(line.charAt(i+1)) >= 0 ){
-            System.out.println("invalid expression");
+            System.out.println("invalid");
             return null;
           }
 
-          if (done_par == 1) {
-            open = 0;
-            close = -1;
-          }
           open++;
+          if (open < 1){
+            open = -1;
+            break;
+          }
         }
 
         if (c == ')'){
@@ -94,41 +100,30 @@ public class ExpressionCheck {
           // e.g. valid: ...)+... or ...))...
           // invalid:   ...)9...
           if (i!=line.length()-1 && all_operators.indexOf(line.charAt(i+1)) < 0 ){
-            System.out.println("invalid expression");
+            System.out.println("invalid");
             return null;
           }
 
           if (i!=0 && operators.indexOf(line.charAt(i-1)) >= 0 ){
-            System.out.println("invalid expression");
+            System.out.println("invalid");
             return null;
           }
 
-          if (close == -1){
-            close = open;
-            if (close == 1)
-              done_par = 1;
+          open --;
+          if (open < 0){
+            break;
           }
-          else {
-            if (close == 1)
-              done_par = 1;
-          }
-          close--;
         }
         // all open parentheses have closed, reset open,close counters
         // in case more parentheses open
       }
-
-      if (open == 0 && close == -1){
-        //System.out.println("valid expression");
-        return line.toString();
-      }
-
-      else if (close != 0){
-        System.out.println("invalid expression: wrong parentheses");
+    
+      if (open != 0){
+        System.out.println("invalid expression, wrong parentheses");
         return null;
       }
       else {
-        //System.out.println("valid expression");
+        System.out.println("valid expression");
         return line.toString();
       }
 
