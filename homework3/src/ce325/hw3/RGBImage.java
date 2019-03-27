@@ -2,12 +2,12 @@
  * Implements the basic operations of the Image interface.
  */
 package ce325.hw3;
-
+import java.util.Random;
 /**
  *
  * @author klajdi bodurri && eirini tsitsopoulou
  */
-public class RGBImage{
+public class RGBImage implements Image{
     private RGBPixel [][]image;
     private int maxColorDepth, width, height;
     
@@ -16,7 +16,7 @@ public class RGBImage{
         maxColorDepth = colordepth;
         this.width = width;
         this.height = height;
-        image = new RGBPixel[width][height];
+        image = new RGBPixel[height][width];
     }
     
     /* Copies a specific image to image */
@@ -54,7 +54,7 @@ public class RGBImage{
     private void copyImage(RGBImage copyImg) {
         int i, j;
         
-        for (i=0; i<width; i++) {
+        for (i=0; i<height; i++) {
             for (j=0; j<height; j++) {
                 RGBPixel copyPixel = copyImg.getPixelOfImage(i, j);
                 image[i][j] = new RGBPixel(copyPixel);
@@ -62,8 +62,91 @@ public class RGBImage{
         }
     }
     
+    /* converts the image to black and white */
+    public void grayscale() {
+        int i, j;
+        short gray;
+        RGBPixel currPixel = null;
+        
+        for (i=0; i<height; i++) {
+            for (j=0; j<width; j++) {
+                currPixel = image[i][j];
+                gray = (short)(currPixel.getRed() * 0.3 + currPixel.getGreen() * 0.59 + currPixel.getBlue() * 0.11); 
+                currPixel.setRed((gray));
+                currPixel.setGreen((gray));
+                currPixel.setBlue((gray));
+            }
+        }
+    }
+    
+    /* doubles the size of the image */
+    public void doublesize(){};
+    
+    /* decreases the size of the image to the half */
+    public void halfsize(){};
+    
+    /* rotates the image 90degrees to the right */
+    public void ratateClockwise(){
+        int i, j, pos, tmp;
+        RGBPixel currPixel = null;
+        RGBPixel [][]rotatedImage = new RGBPixel[width][height];
+        
+        for (i=0; i<height; i++) {
+            
+            /* find the proper column in the rotated image */
+            if (i == 0){ 
+                pos = height - 1;
+            }
+            else if (i == height - 1) {
+                pos = 0;
+            }
+            else {
+                pos = i;
+            }
+            
+            /* save the i-th row of the image to the pos-th column of the rotated image */
+            for (j=0; j<width; j++) {
+                rotatedImage[j][pos] = image[i][j];
+            }
+        }
+        
+        /* Update the image */
+        image = rotatedImage;
+        tmp = width;
+        width = height;
+        height = tmp;
+    };
+    
+    public String toString() {
+        String toStringImage = "";
+        int i, j;
+        
+        for (i=0; i<height; i++) {
+            for (j=0; j<width; j++) {
+                toStringImage += image[i][j].getRed() + " ";
+            }
+            toStringImage += '\n';
+        }
+        return toStringImage;
+    }
+    
     public static void main(String []args) {
-        RGBImage tmp = new RGBImage(3,3, 255);
-        System.out.println(tmp.getPixelOfImage(2,2));
+        Random rand = new Random();
+        RGBImage img = new RGBImage(2,3, 255);
+        int i, j;
+        short red, green, blue;
+        
+        for (i=0; i<3; i++) {
+            for (j=0; j<2; j++) {
+                red = (short)rand.nextInt(255);
+                green = (short)rand.nextInt(255);
+                blue = (short)rand.nextInt(255);
+                RGBPixel tmp = new RGBPixel(red, green, blue);
+                img.setPixeltoImage(tmp, i, j);
+            }
+        }
+        System.out.println(img.toString());
+        img.ratateClockwise();
+        System.out.println(img.toString());
     }
 }
