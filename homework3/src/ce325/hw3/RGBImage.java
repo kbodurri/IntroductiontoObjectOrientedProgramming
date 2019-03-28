@@ -80,7 +80,21 @@ public class RGBImage implements Image{
     }
     
     /* doubles the size of the image */
-    public void doublesize(){};
+    public void doublesize(){
+        int i, j;
+        RGBPixel [][]newImage = new RGBPixel[height*2][width*2];
+        
+        for (i=0; i<height; i++) {
+            for (j=0; j<width; j++) {
+                newImage[2*i][2*j] = new RGBPixel(image[i][j]);
+                newImage[2*i+1][2*j] = new RGBPixel(image[i][j]);
+                newImage[2*i][2*j+1] = new RGBPixel(image[i][j]);
+                newImage[2*i+1][2*j+1] = new RGBPixel(image[i][j]);
+            }
+        }
+        
+        updateImage(newImage, width*2, height*2);
+    };
     
     /* decreases the size of the image to the half */
     public void halfsize(){};
@@ -111,10 +125,7 @@ public class RGBImage implements Image{
         }
         
         /* Update the image */
-        image = rotatedImage;
-        tmp = width;
-        width = height;
-        height = tmp;
+        updateImage(rotatedImage, height, width);
     };
     
     public String toString() {
@@ -130,13 +141,20 @@ public class RGBImage implements Image{
         return toStringImage;
     }
     
+    /* Update image and its size */
+    private void updateImage(RGBPixel [][]updatedImage, int updatedWidth, int updatedHeight) {
+        image = updatedImage;
+        width = updatedWidth;
+        height = updatedHeight;
+    }
+    
     public static void main(String []args) {
         Random rand = new Random();
-        RGBImage img = new RGBImage(2,3, 255);
+        RGBImage img = new RGBImage(2,2, 255);
         int i, j;
         short red, green, blue;
         
-        for (i=0; i<3; i++) {
+        for (i=0; i<2; i++) {
             for (j=0; j<2; j++) {
                 red = (short)rand.nextInt(255);
                 green = (short)rand.nextInt(255);
@@ -146,7 +164,7 @@ public class RGBImage implements Image{
             }
         }
         System.out.println(img.toString());
-        img.ratateClockwise();
+        img.doublesize();
         System.out.println(img.toString());
     }
 }
