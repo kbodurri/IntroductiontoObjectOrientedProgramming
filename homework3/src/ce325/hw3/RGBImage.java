@@ -2,6 +2,8 @@
  * Implements the basic operations of the Image interface.
  */
 package ce325.hw3;
+import java.lang.Math;
+import java.util.Random;
 /**
  *
  * @author klajdi bodurri && eirini tsitsopoulou
@@ -96,10 +98,47 @@ public class RGBImage implements Image{
         }
         
         updateImage(newImage, width*2, height*2);
-    };
+    }
     
     /* decreases the size of the image to the half */
-    public void halfsize(){};
+    public void halfsize(){
+        int i,j, halfHeight, halfWidth;
+        short avgRed, avgGreen, avgBlue;
+        
+        /* half the size of the image */
+        halfHeight = (int)Math.floor((double)height/2);
+        halfWidth = (int)Math.floor((double)width/2);
+        
+        RGBPixel [][]newImage = new RGBPixel[halfHeight][halfWidth];
+        
+        /* calculate the average colour for each pixel */
+        for (i=0; i<halfHeight; i++) {
+            for (j=0; j<halfWidth; j++) {
+                if (i == halfHeight-1 && halfHeight != 1) {
+                    avgRed = calculateAvgColor(new short [] {image[2*i][2*j].getRed(), 
+                                                            image[2*i][2*j+1].getRed()});
+                    avgGreen = calculateAvgColor(new short [] {image[2*i][2*j].getGreen(),
+                                                               image[2*i][2*j+1].getGreen()});
+                    avgBlue = calculateAvgColor(new short[] {image[2*i][2*j].getBlue(),
+                                                               image[2*i][2*j+1].getBlue()});
+                } else {
+                    avgRed = calculateAvgColor(new short [] {image[2*i][2*j].getRed(),
+                        image[2*i][2*j+1].getRed(), image[2*i+1][2*j].getRed(),
+                        image[2*i+1][2*j+1].getRed()});
+                    
+                    avgGreen = calculateAvgColor(new short [] {image[2*i][2*j].getGreen(),
+                        image[2*i][2*j+1].getGreen(), image[2*i+1][2*j].getGreen(),
+                        image[2*i+1][2*j+1].getGreen()});
+                    
+                    avgBlue = calculateAvgColor(new short [] {image[2*i][2*j].getBlue(),
+                        image[2*i][2*j+1].getBlue(), image[2*i+1][2*j].getBlue(),
+                        image[2*i+1][2*j+1].getBlue()});
+                }
+                newImage[i][j] = new RGBPixel(avgRed, avgGreen, avgBlue);
+            }
+        }
+        updateImage(newImage, halfWidth, halfHeight);
+    }
     
     /* rotates the image 90degrees to the right */
     public void ratateClockwise(){
@@ -128,7 +167,7 @@ public class RGBImage implements Image{
         
         /* Update the image */
         updateImage(rotatedImage, height, width);
-    };
+    }
     
     /* Create a new empty image */
     public void createDummyImage(int width, int height, int colordepth) {
@@ -158,6 +197,16 @@ public class RGBImage implements Image{
         height = updatedHeight;
     }
     
+    /* Calculates the avg value of an array of colours */
+    private short calculateAvgColor(short []array) {
+        int i;
+        int sum=0;
+        for (i=0; i<array.length; i++){
+            sum += array[i];
+        }
+        return (short)(sum/array.length);
+    } 
+    
     /*
     public static void main(String []args) {
         Random rand = new Random();
@@ -175,7 +224,7 @@ public class RGBImage implements Image{
             }
         }
         System.out.println(img.toString());
-        img.doublesize();
+        img.halfsize();
         System.out.println(img.toString());
     }
     */
