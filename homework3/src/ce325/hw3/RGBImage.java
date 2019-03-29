@@ -2,7 +2,6 @@
  * Implements the basic operations of the Image interface.
  */
 package ce325.hw3;
-import java.util.Random;
 /**
  *
  * @author klajdi bodurri && eirini tsitsopoulou
@@ -10,6 +9,9 @@ import java.util.Random;
 public class RGBImage implements Image{
     private RGBPixel [][]image;
     private int maxColorDepth, width, height;
+    
+    /* Empty constructor */
+    public RGBImage() {};
     
     /* Creates a new image */
     public RGBImage(int width, int height, int colordepth) {
@@ -66,7 +68,7 @@ public class RGBImage implements Image{
     public void grayscale() {
         int i, j;
         short gray;
-        RGBPixel currPixel = null;
+        RGBPixel currPixel;
         
         for (i=0; i<height; i++) {
             for (j=0; j<width; j++) {
@@ -128,6 +130,14 @@ public class RGBImage implements Image{
         updateImage(rotatedImage, height, width);
     };
     
+    /* Create a new empty image */
+    public void createDummyImage(int width, int height, int colordepth) {
+        maxColorDepth = colordepth;
+        this.width = width;
+        this.height = height;
+        image = new RGBPixel[this.height][this.width];
+    }
+    
     public String toString() {
         String toStringImage = "";
         int i, j;
@@ -148,6 +158,7 @@ public class RGBImage implements Image{
         height = updatedHeight;
     }
     
+    /*
     public static void main(String []args) {
         Random rand = new Random();
         RGBImage img = new RGBImage(2,2, 255);
@@ -167,4 +178,5 @@ public class RGBImage implements Image{
         img.doublesize();
         System.out.println(img.toString());
     }
+    */
 }
