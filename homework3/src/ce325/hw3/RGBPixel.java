@@ -52,4 +52,26 @@ public class RGBPixel {
     public void setBlue(short blue) {
         pixel = (pixel & 0xFFFFFF00) | blue;
     }
+    
+    /* Returns the value of the pixel */
+    public int getRGB() {
+        return pixel;
+    }
+    
+    /* Sets a value to the pixel */
+    public void setRGB(int value) {
+        pixel = (value & 0x00FFFFFF);
+    }
+    
+    /* Sets the colours to the pixel */
+    public final void setRGB(short red, short green, short blue) {
+        setRed(red);
+        setGreen(green);
+        setBlue(blue);
+    }
+    
+    /* Returns the RGB values as string */
+    public String toString() {
+        return "("+getRed()+","+getGreen()+","+getBlue()+")";
+    }
 }
