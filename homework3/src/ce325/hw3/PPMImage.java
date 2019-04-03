@@ -66,7 +66,7 @@ public class PPMImage extends RGBImage {
                     red = sc.nextShort();
                     green = sc.nextShort();
                     blue = sc.nextShort();
-                    super.setPixeltoImage(new RGBPixel(red, green, blue), i, j);
+                    super.setPixel(i, j, new RGBPixel(red, green, blue));
                 }
             }
         }
@@ -81,7 +81,7 @@ public class PPMImage extends RGBImage {
 
         for (i=0; i<super.getHeight(); i++) {
             for (j=0; j<super.getWidth(); j++) {
-                tmp = super.getPixelOfImage(i, j);
+                tmp = super.getPixel(i, j);
                 ppm += String.format("%d %d %d\n", tmp.getRed(), tmp.getGreen(), tmp.getBlue());
             }
         }
@@ -112,7 +112,7 @@ public class PPMImage extends RGBImage {
     }
     
     public static void main(String []args) throws FileNotFoundException, UnsupportedFileFormatException, IOException {
-        File file1 = new File("/home/klajdi/NetBeansProjects/project3/test/photos/3x2.ppm");
+        File file1 = new File("/home/klajdi/NetBeansProjects/project3/test/photos/ein.ppm");
         File file2 = new File("/home/klajdi/NetBeansProjects/project3/test/photos/tmp.ppm");
         PPMImage image = new PPMImage(file1);
         image.toFile(file2);
