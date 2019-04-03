@@ -45,13 +45,13 @@ public class RGBImage implements Image{
     }
     
     /* Returns a pixel of the image on position (i,j) */
-    public RGBPixel getPixelOfImage(int i, int j) {
-        return image[i][j];
+    public RGBPixel getPixel(int row, int col) {
+        return image[row][col];
     }
     
     /* Set a specific pixel to the position (i,j) of the image */
-    public void setPixeltoImage(RGBPixel pixel, int i, int j) {
-        image[i][j] = new RGBPixel(pixel);
+    public void setPixel(int row, int col, RGBPixel pixel) {
+        image[row][col] = new RGBPixel(pixel);
     }
     
     /* Copies the specific image to image */
@@ -60,7 +60,7 @@ public class RGBImage implements Image{
         
         for (i=0; i<height; i++) {
             for (j=0; j<height; j++) {
-                RGBPixel copyPixel = copyImg.getPixelOfImage(i, j);
+                RGBPixel copyPixel = copyImg.getPixel(i, j);
                 image[i][j] = new RGBPixel(copyPixel);
             }
         }
@@ -220,7 +220,7 @@ public class RGBImage implements Image{
                 green = (short)rand.nextInt(255);
                 blue = (short)rand.nextInt(255);
                 RGBPixel tmp = new RGBPixel(red, green, blue);
-                img.setPixeltoImage(tmp, i, j);
+                img.setPixel(tmp, i, j);
             }
         }
         System.out.println(img.toString());
