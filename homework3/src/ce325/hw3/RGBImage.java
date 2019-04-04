@@ -2,7 +2,6 @@
  * Implements the basic operations of the Image interface.
  */
 package ce325.hw3;
-import java.lang.Math;
 import java.util.Random;
 /**
  *
@@ -21,11 +20,18 @@ public class RGBImage implements Image{
         this.width = width;
         this.height = height;
         image = new RGBPixel[height][width];
+        initImage();
     }
     
-    /* Copies a specific image to image */
+    /* Creates an image from copyImg */
     public RGBImage(RGBImage copyImg) {
         this(copyImg.getWidth(), copyImg.getHeight(), copyImg.getColorDepth());
+        copyImage(copyImg);
+    }
+    
+    /* Creates a RGB image from YUV image */
+    public RGBImage(YUVImage copyImg) {
+        this(copyImg.getWidth(), copyImg.getHeight(), 255);
         copyImage(copyImg);
     }
     
@@ -51,7 +57,7 @@ public class RGBImage implements Image{
     
     /* Set a specific pixel to the position (i,j) of the image */
     public void setPixel(int row, int col, RGBPixel pixel) {
-        image[row][col] = new RGBPixel(pixel);
+        image[row][col] = pixel;
     }
     
     /* Copies the specific image to image */
@@ -67,6 +73,7 @@ public class RGBImage implements Image{
     }
     
     /* converts the image to black and white */
+    @Override
     public void grayscale() {
         int i, j;
         short gray;
@@ -84,6 +91,7 @@ public class RGBImage implements Image{
     }
     
     /* doubles the size of the image */
+    @Override
     public void doublesize(){
         int i, j;
         RGBPixel [][]newImage = new RGBPixel[height*2][width*2];
@@ -101,6 +109,7 @@ public class RGBImage implements Image{
     }
     
     /* decreases the size of the image to the half */
+    @Override
     public void halfsize(){
         int i,j, halfHeight, halfWidth;
         short avgRed, avgGreen, avgBlue;
@@ -141,6 +150,7 @@ public class RGBImage implements Image{
     }
     
     /* rotates the image 90degrees to the right */
+    @Override
     public void ratateClockwise(){
         int i, j, pos, tmp;
         RGBPixel currPixel = null;
@@ -176,20 +186,7 @@ public class RGBImage implements Image{
         this.height = height;
         image = new RGBPixel[this.height][this.width];
     }
-    
-    public String toString() {
-        String toStringImage = "";
-        int i, j;
-        
-        for (i=0; i<height; i++) {
-            for (j=0; j<width; j++) {
-                toStringImage += image[i][j].getRed() + " ";
-            }
-            toStringImage += '\n';
-        }
-        return toStringImage;
-    }
-    
+       
     /* Update image and its size */
     private void updateImage(RGBPixel [][]updatedImage, int updatedWidth, int updatedHeight) {
         image = updatedImage;
@@ -207,25 +204,25 @@ public class RGBImage implements Image{
         return (short)(sum/array.length);
     } 
     
-    /*
-    public static void main(String []args) {
-        Random rand = new Random();
-        RGBImage img = new RGBImage(2,2, 255);
+    /* Copies the specific image to image */
+    private void copyImage(YUVImage copyImg) {
         int i, j;
-        short red, green, blue;
         
-        for (i=0; i<2; i++) {
-            for (j=0; j<2; j++) {
-                red = (short)rand.nextInt(255);
-                green = (short)rand.nextInt(255);
-                blue = (short)rand.nextInt(255);
-                RGBPixel tmp = new RGBPixel(red, green, blue);
-                img.setPixel(tmp, i, j);
+        for (i=0; i<getHeight(); i++) {
+            for (j=0; j<getWidth(); j++) {
+                YUVPixel copyPixel = copyImg.getPixel(i, j);
+                setPixel(i, j, new RGBPixel(copyPixel));
             }
         }
-        System.out.println(img.toString());
-        img.halfsize();
-        System.out.println(img.toString());
     }
-    */
+    
+    /* Initializes the image */
+    private void initImage() {
+        int i,j;
+        for (i=0; i<getHeight(); i++) {
+            for (j=0; j<getWidth(); j++) {
+                setPixel(i, j, new RGBPixel((short)0, (short)0, (short)0));
+            }
+        }
+    }
 }
