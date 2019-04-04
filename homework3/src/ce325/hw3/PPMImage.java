@@ -20,6 +20,10 @@ public class PPMImage extends RGBImage {
         super(image);
     }
     
+    public PPMImage(YUVImage image) {
+        super(image);
+    }
+    
     /* Reads the ppm image. */
     private void readImage(java.io.File file) throws UnsupportedFileFormatException, FileNotFoundException {
         /* check if file exists and if it is readable */
@@ -75,26 +79,28 @@ public class PPMImage extends RGBImage {
     /* Returns the data of the ppm image */
     @Override
     public String toString() {
-        String ppm = String.format("P3\n %d %d %d\n", super.getWidth(), super.getHeight(), super.getColorDepth());
+        StringBuilder ppm = new StringBuilder(String.format("P3\n %d %d %d\n", 
+                    super.getWidth(), super.getHeight(), super.getColorDepth()));
         int i, j;
         RGBPixel tmp;
 
         for (i=0; i<super.getHeight(); i++) {
             for (j=0; j<super.getWidth(); j++) {
                 tmp = super.getPixel(i, j);
-                ppm += String.format("%d %d %d\n", tmp.getRed(), tmp.getGreen(), tmp.getBlue());
+                ppm.append(String.format("%d %d %d\n", tmp.getRed(), tmp.getGreen(), tmp.getBlue()));
             }
         }
-        return ppm;
+        return ppm.toString();
     }
     
     /* Creates a ppm file */
     public void toFile(java.io.File file) throws IOException {
         createNewFile(file);
         
-        try (PrintWriter outputStream = new  PrintWriter(new FileWriter(file))) {
-            outputStream.print(toString());
+        try (BufferedWriter bufferWriter = new BufferedWriter(new FileWriter(file))) {
+            bufferWriter.write(toString());
         }
+        
     }
     
     private void createNewFile(java.io.File file) {
@@ -112,9 +118,7 @@ public class PPMImage extends RGBImage {
     }
     
     public static void main(String []args) throws FileNotFoundException, UnsupportedFileFormatException, IOException {
-        File file1 = new File("/home/klajdi/NetBeansProjects/project3/test/photos/ein.ppm");
-        File file2 = new File("/home/klajdi/NetBeansProjects/project3/test/photos/tmp.ppm");
-        PPMImage image = new PPMImage(file1);
-        image.toFile(file2);
+        File file = new File("/home/klajdi/NetBeansProjects/project3/test/photos/PPM/tmp.ppm");
+        PPMImage image = new PPMImage(file);
     }
 }
