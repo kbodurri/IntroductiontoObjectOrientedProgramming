@@ -20,6 +20,10 @@ public class RGBPixel {
         this(pixel.getRed(), pixel.getGreen(), pixel.getBlue());
     }
     
+    public RGBPixel(YUVPixel pixel) {
+        YUVtoRGB(pixel);
+    }
+    
     /* Returns the red value of the pixel */
     public short getRed() {
         short value = (short)((pixel & (255<<16))>> 16);
@@ -73,5 +77,32 @@ public class RGBPixel {
     /* Returns the RGB values as string */
     public String toString() {
         return "("+getRed()+","+getGreen()+","+getBlue()+")";
+    }
+    
+    /* Converts a YUV pixel to RGB. */
+    private void YUVtoRGB(YUVPixel pixel) {
+        short red, green, blue;
+        int C, D, E;
+        
+        C = pixel.getY() - 16;
+        D = pixel.getU() - 128;
+        E = pixel.getV() - 128;
+        
+        red = clip((298 * C + 409 * E + 128) >> 8);
+        green = clip((298 * C - 100 * D - 208 * E + 128) >> 8);
+        blue = clip((298 * C + 516 * D + 128) >> 8);
+        setRed(red);
+        setGreen(green);
+        setBlue(blue);
+    }
+    
+    private short clip(int number) {
+        if (number < 0) {
+            return 0;
+        } 
+        else if (number > 255) {
+            return 255;
+        }
+        return (short) number;
     }
 }
