@@ -70,8 +70,8 @@ public class YUVImage {
     private void copyImage(YUVImage copyImg) {
         int i, j;
         
-        for (i=0; i<getHeight(); i++) {
-            for (j=0; j<getWidth(); j++) {
+        for (i=0; i<height; i++) {
+            for (j=0; j<width; j++) {
                 YUVPixel copyPixel = copyImg.getPixel(i, j);
                 setPixel(i, j, new YUVPixel(copyPixel));
             }
@@ -83,7 +83,7 @@ public class YUVImage {
         int i, j;
         
         for (i=0; i<height; i++) {
-            for (j=0; j<height; j++) {
+            for (j=0; j<width; j++) {
                 setPixel(i, j, new YUVPixel(copyImg.getPixel(i, j)));
             }
         }

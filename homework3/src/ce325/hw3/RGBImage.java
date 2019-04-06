@@ -65,7 +65,7 @@ public class RGBImage implements Image{
         int i, j;
         
         for (i=0; i<height; i++) {
-            for (j=0; j<height; j++) {
+            for (j=0; j<width; j++) {
                 RGBPixel copyPixel = copyImg.getPixel(i, j);
                 image[i][j] = new RGBPixel(copyPixel);
             }
