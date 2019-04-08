@@ -116,9 +116,4 @@ public class PPMImage extends RGBImage {
             ex.printStackTrace();
         } 
     }
-    
-    public static void main(String []args) throws FileNotFoundException, UnsupportedFileFormatException, IOException {
-        File file = new File("/home/klajdi/NetBeansProjects/project3/test/photos/PPM/tmp.ppm");
-        PPMImage image = new PPMImage(file);
-    }
 }

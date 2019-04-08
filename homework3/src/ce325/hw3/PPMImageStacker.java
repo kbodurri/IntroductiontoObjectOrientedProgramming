@@ -105,13 +105,4 @@ public class PPMImageStacker {
              }
          }
     }
-    
-    public static void main(String []args) throws FileNotFoundException, UnsupportedFileFormatException, IOException {
-        File file = new File("/home/klajdi/NetBeansProjects/project3/test/photos/stacking-images/orion_nebula");
-        File stackedFileImage = new File("/home/klajdi/NetBeansProjects/project3/test/photos/stacking-images/orion_nebula/stacked.ppm");
-        PPMImageStacker imageStacker = new PPMImageStacker(file);
-        imageStacker.stack();
-        PPMImage stackedImage = imageStacker.getStackedImage();
-        stackedImage.toFile(stackedFileImage);
-    }
 }
