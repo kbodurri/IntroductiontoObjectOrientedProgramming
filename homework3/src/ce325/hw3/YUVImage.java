@@ -3,6 +3,7 @@
  */
 package ce325.hw3;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -138,6 +139,12 @@ public class YUVImage {
                 }
             }
         }
+    }
+    
+    /* Uses the histogram equalization method for the YUV image */
+    public void equalize() {
+        Histogram hist = new Histogram(this);
+        hist.equalize();
     }
 
     @Override
