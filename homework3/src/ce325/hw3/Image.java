@@ -18,5 +18,5 @@ public interface Image {
     public void halfsize();
     
     /* rotates the image 90degrees to the right */
-    public void ratateClockwise();
+    public void rotateClockwise();
 }
