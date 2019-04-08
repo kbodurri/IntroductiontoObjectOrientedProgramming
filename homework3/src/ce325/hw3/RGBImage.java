@@ -8,6 +8,7 @@ import java.util.Random;
  * @author klajdi bodurri && eirini tsitsopoulou
  */
 public class RGBImage implements Image{
+    public static int MAX_COLORDEPTH = 255;
     private RGBPixel [][]image;
     private int maxColorDepth, width, height;
     
@@ -151,7 +152,7 @@ public class RGBImage implements Image{
     
     /* rotates the image 90degrees to the right */
     @Override
-    public void ratateClockwise(){
+    public void rotateClockwise(){
         int i, j, pos, tmp;
         RGBPixel currPixel = null;
         RGBPixel [][]rotatedImage = new RGBPixel[width][height];
@@ -159,15 +160,7 @@ public class RGBImage implements Image{
         for (i=0; i<height; i++) {
             
             /* find the proper column in the rotated image */
-            if (i == 0){ 
-                pos = height - 1;
-            }
-            else if (i == height - 1) {
-                pos = 0;
-            }
-            else {
-                pos = i;
-            }
+            pos = (height-1) - i;
             
             /* save the i-th row of the image to the pos-th column of the rotated image */
             for (j=0; j<width; j++) {
