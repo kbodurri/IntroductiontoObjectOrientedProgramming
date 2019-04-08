@@ -3,10 +3,12 @@
  */
 package ce325.hw3;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
-
+import java.util.Arrays; 
 /**
  *
  * @author Klajdi Bodurri && Eirini Tsitsopoulou.
@@ -46,6 +48,11 @@ public class Histogram {
                 img.getPixel(i, j).setY((short) multipliedCumulativeProbability[prevY]);
             }
         }
+    }
+    
+    /* Returns the equalized value of Y (lumocity) */
+    public short getEqualizedLuminocity(int luminocity) {
+        return (short) multipliedCumulativeProbability[luminocity-16];
     }
     
     /* Calculates the intensity of the pixels. */
@@ -91,14 +98,61 @@ public class Histogram {
         }
     }
     
-    public static void main(String []args) throws FileNotFoundException, UnsupportedFileFormatException, IOException {
-         File einFile = new File("/home/klajdi/NetBeansProjects/project3/test/photos/PPM/ein.ppm");
-         File einEqualized = new File("/home/klajdi/NetBeansProjects/project3/test/photos/PPM/equalized.ppm");
-         
-         YUVImage einYUV = new YUVImage(new PPMImage(einFile));
-         Histogram einHist = new Histogram(einYUV);
-         einHist.equalize();
-         PPMImage einPPMequalized = new PPMImage(einYUV);
-         einPPMequalized.toFile(einEqualized);
+    /* finds the max value of an array of integers */
+    private int findMax(int []myArray) {
+        int max = -1;
+        
+        for (int value: myArray) {
+            if (value > max) {
+                max = value;
+            }
+        }
+        return max;
+    }
+    
+    /* Creates a string with * based on the histogram */
+    @Override
+    public String toString() {
+        StringBuilder hist = new StringBuilder();
+        int i, j;
+        
+        int scale;
+        scale = (int) Math.floor(findMax(pixelIntensity)/80);
+        System.out.println(scale);
+        System.out.println(findMax(pixelIntensity));
+        
+        for (i=0; i<LENGTH; i++) {
+            hist.append(i+16).append(" ");
+            for (j=0; j<(int) pixelIntensity[i]/scale; j++) {
+                hist.append("*");
+            }
+            hist.append('\n');
+        }
+        
+        return hist.toString();
+    }
+    
+    /* Save the string from toString method into a file */
+    public void toFile(java.io.File file) throws IOException {
+        createNewFile(file);
+        
+        try (BufferedWriter bufferWriter = new BufferedWriter(new FileWriter(file))) {
+            bufferWriter.write(toString());
+        }
+        
+    }
+    
+    private void createNewFile(java.io.File file) {
+        /* delete it */
+        if (file.exists()) {
+            file.delete();
+        }
+        
+        /* create a new file */
+        try {
+            file.createNewFile();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } 
     }
 }
