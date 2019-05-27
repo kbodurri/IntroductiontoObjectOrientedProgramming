@@ -67,10 +67,17 @@ class AVL {
         bool rmv(string);
         void print2DotFile(char *filename);
         Node* getRoot();
-        ~AVL();
+        //~AVL();
+
+        Iterator begin() const;
+        Iterator end();
     private:
         Node* search(Node*, string);
-        bool insert(Node*, Node*, string);
+        Node* insert(Node*, Node*, string);
+        Node* rebalanceNode(Node*);
+        void rebalance(Node*);
+        Node* singleRightRotation(Node*, Node*, Node*);
+        Node* singleLeftRotation(Node*, Node*, Node*);
 };
 
 

@@ -61,7 +61,7 @@ bool Node::isLeft() const {
     }
 
     Node *l = parent->getLeft();
-    if (!element.compare(l->getElement())) {
+    if (l == this) {
         return true;
     }
     return false;
@@ -74,7 +74,7 @@ bool Node::isRight() const {
     }
 
     Node *r = parent->getRight();
-    if (!element.compare(r->getElement())) {
+    if (r == this) {
         return true;
     }
     return false;
@@ -151,6 +151,7 @@ void Iterator::preOrder(Node *root) {
             nodeStack.push(cur->getLeft());
         }
     }
+
 }
 
 /* Returns the pre-ordered queue */
@@ -219,21 +220,24 @@ Node* AVL::getRoot() {
 }
 
 bool AVL::add(string s) {
-    if (insert(root, nullptr, s)) {
-        return true;
+    Node* v = insert(root, nullptr, s);
+    if (v == nullptr) {
+        return false;
     }
-    return false;
+    rebalance(v);
+    return true;
 }
 
 /* Insert a node to the tree recursively */
-bool AVL::insert(Node *current, Node *previous, string s) {
+Node* AVL::insert(Node *current, Node *previous, string s) {
     int compareResult;
     Node *newNode;
 
     // there is no node with element s, insert it to the tree
     if (current == nullptr) {
         if (root == nullptr) { // empty tree
-            root = new Node(s, nullptr, nullptr, nullptr);
+            newNode = new Node(s, nullptr, nullptr, nullptr);
+            root = newNode;
         }
         else {
             // allocation the new node and insert it as a leaf
@@ -246,13 +250,13 @@ bool AVL::insert(Node *current, Node *previous, string s) {
                 previous->setRight(newNode);
             }
         }
-        return true;
+        return newNode;
     }
 
     /* search if the node with element s exists in the tree */
     compareResult = current->getElement().compare(s);
     if (compareResult == 0) {
-        return false;
+        return nullptr;
     }
     else if (compareResult > 0) {
         return this->insert(current->getLeft(), current, s);
@@ -284,6 +288,96 @@ Node* AVL::search(Node *current, string s) {
     }
 }
 
+/* Get the node which will participate in the rebalancing */
+Node* AVL::rebalanceNode(Node* v) {
+    if (v->leftChildHeight() > v->rightChildHeight()) {
+        return v->getLeft();
+    }
+    else if (v->leftChildHeight() < v->rightChildHeight()) {
+        return v->getRight();
+    }
+    else if (v->isLeft()) {
+        return v->getLeft();
+    }
+    else {
+        return v->getRight();
+    }
+}
+
+/* Apply a single right rotation */
+Node* AVL::singleRightRotation(Node *v, Node* w, Node* u) {
+    // first update the parents of the nodes
+    if (v != root) {
+        if (v->isLeft()) {
+            v->getParent()->setLeft(w);
+        }
+        else {
+            v->getParent()->setRight(w);
+        }
+        w->setParent(v->getParent());
+    }
+
+    // apply rebalance
+    v->setLeft(w->getRight());
+    if (w->getRight() != nullptr) {
+        w->getRight()->setParent(v);
+    }
+    w->setRight(v);
+    v->setParent(w);
+
+    // update the root of the tree
+    if (v == root) {
+        root = w;
+        w->setParent(nullptr);
+    }
+    return w;
+}
+
+Node *AVL::singleLeftRotation(Node *v, Node *w, Node *u) {
+    if (v != root) {
+        if (v->isRight()) {
+            v->getParent()->setRight(w);
+        }
+        else {
+            v->getParent()->setLeft(w);
+        }
+        w->setParent(v->getParent());
+    }
+
+    v->setRight(w->getLeft());
+    if (w->getLeft() != nullptr) {
+        w->getLeft()->setParent(v);
+    }
+    w->setLeft(v);
+    v->setParent(w);
+    if (v == root) {
+        root = w;
+        w->setParent(nullptr);
+    }
+    return w;
+}
+
+void AVL::rebalance(Node *v) {
+    Node *u=nullptr;
+    Node *w=nullptr;
+
+    while(v != nullptr) { // iterate throught the whole tree
+        v->updateHeight();
+        if (!v->isBalanced()) {
+            w = rebalanceNode(v);
+            u = rebalanceNode(w);
+
+            if (w->isLeft() && u->isLeft()) { // single right rotation
+                v = singleRightRotation(v, w, u);
+            }
+            else if (w->isRight() && w->isRight()) { // left single rotation
+                v = singleLeftRotation(v, w, u);
+            }
+        }
+        v = v->getParent();
+    }
+}
+
 /* Checks if the AVL tree has a node with element s */
 bool AVL::contains(string s) {
     if (this->search(root, s) == nullptr) {
@@ -292,26 +386,34 @@ bool AVL::contains(string s) {
     return true;
 }
 
+Iterator AVL::begin() const {
+    Iterator *it = new Iterator(root);
+    return *it;
+}
+
 int main() {
     AVL tree;
-    string a("a");
-    string b("b");
-    string c("c");
+    string a("11");
+    string b("10");
+    string c("12");
+    string d("13");
+    string e("14");
 
-    tree.add(c);
     tree.add(a);
     tree.add(b);
+    tree.add(c);
+    tree.add(d);
+    tree.add(e);
     Iterator it(tree.getRoot());
 
-    cout << *it << endl;
-    ++it;
-    cout << *it << endl;
-    ++it;
-    cout << *it << endl;
 
-    cout << tree.contains("b") << endl;
-    cout << tree.contains("a") << endl;
-    cout << tree.contains("c") << endl;
-    cout << tree.contains("d") << endl;
-
+    cout << *it << endl;
+    it++;
+    cout << *it << endl;
+    it++;
+    cout << *it << endl;
+    it++;
+    cout << *it << endl;
+    it++;
+    cout << *it << endl;
 };
