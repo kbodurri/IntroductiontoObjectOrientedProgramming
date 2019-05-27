@@ -52,6 +52,7 @@ class Iterator {
 
         void preOrder(Node *root);
         bool hasNext();
+        bool isEmpty();
         void skip();
 };
 
@@ -78,6 +79,8 @@ class AVL {
         void rebalance(Node*);
         Node* singleRightRotation(Node*, Node*, Node*);
         Node* singleLeftRotation(Node*, Node*, Node*);
+        Node* doubleRightLeftRotation(Node*, Node*, Node*);
+        Node* doubleLeftRightRotation(Node*, Node*, Node*);
 };
 
 

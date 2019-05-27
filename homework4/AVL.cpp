@@ -159,6 +159,11 @@ queue<Node *> Iterator::getQueue() {
     return preOrderedQueue;
 }
 
+/* Checks if the queue is empty */
+bool Iterator::isEmpty() {
+    return this->getQueue().empty();
+}
+
 /* Increases the iterator by one */
 Iterator& Iterator::operator++() {
     if (this->hasNext()) {
@@ -199,7 +204,7 @@ bool Iterator::operator==(Iterator it) {
 
 /* Checks if any node left in pre ordered queue */
 bool Iterator::hasNext() {
-    if (this->preOrderedQueue.empty()) {
+    if (this->isEmpty()) {
         return false;
     }
     return true;
@@ -333,6 +338,7 @@ Node* AVL::singleRightRotation(Node *v, Node* w, Node* u) {
     return w;
 }
 
+/* Apply a single left rotation */
 Node *AVL::singleLeftRotation(Node *v, Node *w, Node *u) {
     if (v != root) {
         if (v->isRight()) {
@@ -357,6 +363,20 @@ Node *AVL::singleLeftRotation(Node *v, Node *w, Node *u) {
     return w;
 }
 
+/* Apply a right rotation and then a left rotation */
+Node* AVL::doubleRightLeftRotation(Node *v, Node *w, Node *u) {
+    singleRightRotation(w, u, v);
+    singleLeftRotation(v, u, w);
+    return u;
+}
+
+/* Apply a right rotation and then a left rotation */
+Node* AVL::doubleLeftRightRotation(Node *v, Node *w, Node *u) {
+    singleLeftRotation(w, u, v);
+    singleRightRotation(v, u, w);
+    return u;
+}
+
 void AVL::rebalance(Node *v) {
     Node *u=nullptr;
     Node *w=nullptr;
@@ -370,8 +390,14 @@ void AVL::rebalance(Node *v) {
             if (w->isLeft() && u->isLeft()) { // single right rotation
                 v = singleRightRotation(v, w, u);
             }
-            else if (w->isRight() && w->isRight()) { // left single rotation
+            else if (w->isRight() && u->isRight()) { // left single rotation
                 v = singleLeftRotation(v, w, u);
+            }
+            else if (u->isLeft()) { // double right left rotation
+                v = doubleRightLeftRotation(v, w, u);
+            }
+            else { // double left right rotation
+                v = doubleLeftRightRotation(v, w, u);
             }
         }
         v = v->getParent();
@@ -391,19 +417,23 @@ Iterator AVL::begin() const {
     return *it;
 }
 
-int main() {
+/*int main() {
     AVL tree;
-    string a("11");
-    string b("10");
-    string c("12");
-    string d("13");
-    string e("14");
+    string a("15");
+    string b("12");
+    string c("13");
+    //string d("14");
+    //string e("10");
+    //string f("19");
+    //string g("18");
 
     tree.add(a);
     tree.add(b);
     tree.add(c);
-    tree.add(d);
-    tree.add(e);
+    //tree.add(d);
+    //tree.add(e);
+    //tree.add(f);
+    //tree.add(g);
     Iterator it(tree.getRoot());
 
 
@@ -412,8 +442,12 @@ int main() {
     cout << *it << endl;
     it++;
     cout << *it << endl;
-    it++;
-    cout << *it << endl;
-    it++;
-    cout << *it << endl;
-};
+    //it++;
+    //cout << *it << endl;
+    //it++;
+    //cout << *it << endl;
+    //it++;
+    //cout << *it << endl;
+    //it++;
+    //cout << *it << endl;
+};*/
