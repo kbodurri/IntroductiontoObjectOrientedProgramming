@@ -8,7 +8,6 @@
 
 using namespace std;
 
-
 class Node {
     Node *parent, *left, *right;
     int height;
@@ -54,6 +53,24 @@ class Iterator {
         void preOrder(Node *root);
         bool hasNext();
         void skip();
+};
+
+class AVL {
+    int size;
+    Node* root;
+
+    public:
+        AVL();
+        AVL(AVL&);
+        bool contains(string);
+        bool add(string);
+        bool rmv(string);
+        void print2DotFile(char *filename);
+        Node* getRoot();
+        ~AVL();
+    private:
+        Node* search(Node*, string);
+        bool insert(Node*, Node*, string);
 };
 
 

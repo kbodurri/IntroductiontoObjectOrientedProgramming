@@ -209,24 +209,109 @@ void Iterator::skip() {
     this->preOrderedQueue.pop();
 }
 
+AVL::AVL() {
+    size = 0;
+    root = nullptr;
+};
+
+Node* AVL::getRoot() {
+    return root;
+}
+
+bool AVL::add(string s) {
+    if (insert(root, nullptr, s)) {
+        return true;
+    }
+    return false;
+}
+
+/* Insert a node to the tree recursively */
+bool AVL::insert(Node *current, Node *previous, string s) {
+    int compareResult;
+    Node *newNode;
+
+    // there is no node with element s, insert it to the tree
+    if (current == nullptr) {
+        if (root == nullptr) { // empty tree
+            root = new Node(s, nullptr, nullptr, nullptr);
+        }
+        else {
+            // allocation the new node and insert it as a leaf
+            compareResult = previous->getElement().compare(s);
+            newNode = new Node(s, previous, nullptr, nullptr);
+            if (compareResult > 0) { // as a right child
+                previous->setLeft(newNode);
+            }
+            else { // as a left child
+                previous->setRight(newNode);
+            }
+        }
+        return true;
+    }
+
+    /* search if the node with element s exists in the tree */
+    compareResult = current->getElement().compare(s);
+    if (compareResult == 0) {
+        return false;
+    }
+    else if (compareResult > 0) {
+        return this->insert(current->getLeft(), current, s);
+    }
+    else {
+        return this->insert(current->getRight(), current, s);
+    }
+}
+
+/* Search for the string s in the AVL tree recursively */
+Node* AVL::search(Node *current, string s) {
+    int compareResult;
+    /* doesn't exists in the current tree */
+    if (current == nullptr) {
+        return nullptr;
+    }
+
+    compareResult = current->getElement().compare(s);
+
+    /* found the node with the elemene s */
+    if (compareResult == 0) {
+        return current;
+    } /* search left subtree */
+    else if (compareResult > 0) {
+        return this->search(current->getLeft(), s);
+    } /* search right subtree */
+    else {
+        return this->search(current->getRight(), s);
+    }
+}
+
+/* Checks if the AVL tree has a node with element s */
+bool AVL::contains(string s) {
+    if (this->search(root, s) == nullptr) {
+        return false;
+    }
+    return true;
+}
 
 int main() {
-    Node left("left child", nullptr, nullptr, nullptr);
-    Node right("right child", nullptr, nullptr, nullptr);
-    Node father("father", nullptr, &left, &right);
-    Node leftleft("leftleft", nullptr, nullptr, nullptr);
-    Node leftleftleft("leftleftleft", &leftleft, nullptr, nullptr);
-    left.setParent(&father);
-    left.setLeft(&leftleft);
-    leftleft.setLeft(&leftleftleft);
-    right.setParent(&father);
-    left.updateHeight();
-    leftleft.updateHeight();
+    AVL tree;
+    string a("a");
+    string b("b");
+    string c("c");
 
-    Iterator it(&father);
-    Iterator it2(it);
+    tree.add(c);
+    tree.add(a);
+    tree.add(b);
+    Iterator it(tree.getRoot());
 
-    std::cout << *it << '\n';
-    it2++;
-    std::cout << *it2 << '\n';
-}
+    cout << *it << endl;
+    ++it;
+    cout << *it << endl;
+    ++it;
+    cout << *it << endl;
+
+    cout << tree.contains("b") << endl;
+    cout << tree.contains("a") << endl;
+    cout << tree.contains("c") << endl;
+    cout << tree.contains("d") << endl;
+
+};
