@@ -412,23 +412,97 @@ bool AVL::contains(string s) {
     return true;
 }
 
+/* Remove a node from the tree */
+bool AVL::rmv(string s) {
+    Node *deletedNode = this->search(root, s);
+    Node *checkRebalance = nullptr;
+    if (deletedNode == nullptr) { // node not found
+        return false;
+    }
+
+    if (deletedNode->getRight() == nullptr && deletedNode->getLeft() == nullptr) { // delete a leaf node
+            if (root == deletedNode) {
+                root = nullptr;
+            }
+            checkRebalance = deletedNode->getParent();
+            if (deletedNode->isLeft()) { // update the parent of the leaf node
+                checkRebalance->setLeft(nullptr);
+            }
+            else {
+                checkRebalance->setRight(nullptr);
+            }
+            delete deletedNode;
+    }
+    else if (deletedNode->getRight() != nullptr && deletedNode->getLeft() != nullptr) {// has 2 children
+        Node *minRightSubtreeNode = nullptr;
+        Node *tmp = nullptr;
+
+        for (tmp=deletedNode->getRight(); tmp != nullptr; tmp=tmp->getLeft()) { // find min node of the right subtree
+            minRightSubtreeNode = tmp;
+        }
+
+
+        deletedNode->setElement(minRightSubtreeNode->getElement()); // exchange nodes
+        deletedNode->setRight(minRightSubtreeNode->getRight());
+        if (deletedNode->getRight() != nullptr) { // update parent
+            deletedNode->getRight()->setParent(deletedNode);
+        }
+        checkRebalance = deletedNode;
+        delete minRightSubtreeNode;
+    }
+    else if (deletedNode->getRight() == nullptr) {
+        checkRebalance = deletedNode->getLeft();
+        deletedNode->getLeft()->setParent(deletedNode->getParent());
+        if (deletedNode->getParent() != nullptr) {
+            if (deletedNode->isLeft()) { // update the parent
+                deletedNode->getParent()->setLeft(deletedNode->getLeft());
+            }
+            else {
+                deletedNode->getParent()->setRight(deletedNode->getLeft());
+            }
+        }
+        if (deletedNode == root) {
+            root = checkRebalance;
+        }
+        delete deletedNode;
+    }
+    else {
+        checkRebalance = deletedNode->getRight();
+        deletedNode->getRight()->setParent(deletedNode->getParent());
+        if (deletedNode->getParent() != nullptr) {
+            if (deletedNode->isLeft()) { // update the parent
+                deletedNode->getParent()->setLeft(deletedNode->getRight());
+            }
+            else {
+                deletedNode->getParent()->setRight(deletedNode->getRight());
+            }
+        }
+        if (deletedNode == root) {
+            root = checkRebalance;
+        }
+        delete deletedNode;
+    }
+    rebalance(checkRebalance);
+    return true;
+}
+
 Iterator AVL::begin() const {
     Iterator *it = new Iterator(root);
     return *it;
 }
 
-/*int main() {
+int main() {
     AVL tree;
     string a("15");
-    string b("12");
-    string c("13");
+    //string b("12");
+    string c("16");
     //string d("14");
     //string e("10");
     //string f("19");
     //string g("18");
 
     tree.add(a);
-    tree.add(b);
+    //tree.add(b);
     tree.add(c);
     //tree.add(d);
     //tree.add(e);
@@ -440,14 +514,8 @@ Iterator AVL::begin() const {
     cout << *it << endl;
     it++;
     cout << *it << endl;
-    it++;
-    cout << *it << endl;
-    //it++;
-    //cout << *it << endl;
-    //it++;
-    //cout << *it << endl;
-    //it++;
-    //cout << *it << endl;
-    //it++;
-    //cout << *it << endl;
-};*/
+    cout << "Insertion is completed" << endl;
+    tree.rmv(a);
+    Iterator it2(tree.getRoot());
+    cout << *it2 << endl;
+};
