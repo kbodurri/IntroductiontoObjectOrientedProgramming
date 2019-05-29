@@ -66,18 +66,25 @@ class AVL {
         AVL();
         AVL(AVL&);
         Node* getRoot();
-        bool contains(string);
+        bool contains(string) const;
         bool add(string);
         bool rmv(string);
         void print2DotFile(char *filename);
         void pre_order(std::ostream&);
         friend std::ostream& operator<<(std::ostream &, const AVL&);
+        AVL& operator=(const AVL&);
+        AVL operator+(const AVL&);
+        AVL& operator+=(const AVL&);
+        AVL& operator+=(const string&);
+        AVL& operator-=(const string&);
+        AVL operator+(const string&);
+        AVL operator-(const string& e);
         //~AVL();
 
         Iterator begin() const;
         Iterator end() const;
     private:
-        Node* search(Node*, string);
+        Node* search(Node*, string) const;
         Node* insert(Node*, Node*, string);
         Node* deleteNode(Node *, string);
         Node* rebalanceNode(Node*);

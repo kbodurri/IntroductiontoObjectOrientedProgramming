@@ -1,5 +1,6 @@
 #include "AVL.hpp"
 
+/* Constructor */
 Node::Node(const string& e, Node *parent, Node *left, Node *right) {
     this->element = e;
     this->parent = parent;
@@ -121,10 +122,12 @@ bool Node::isBalanced() {
     return true;
 }
 
+/* Default Constructor */
 Iterator::Iterator() {
     current = nullptr;
 }
 
+/* Constructor */
 Iterator::Iterator(Node *root) {
     if (root != nullptr) {
         nodeStack.push(root);
@@ -132,6 +135,7 @@ Iterator::Iterator(Node *root) {
     }
 }
 
+/* Copy constructor */
 Iterator::Iterator(Iterator &it) {
     current = it.getCurrent();
     nodeStack = it.getStack();
@@ -213,6 +217,7 @@ bool Iterator::operator==(Iterator it) {
     return false;
 }
 
+/* Default constructor */
 AVL::AVL() {
     size = 0;
     root = nullptr;
@@ -220,29 +225,29 @@ AVL::AVL() {
 
 /* Copy constructor */
 AVL::AVL(AVL &copy) : AVL() {
-    Iterator begin, end;
-    begin = copy.begin();
+    Iterator it, end;
+    it = copy.begin();
     end = copy.end();
 
-    while(begin != end) {
-        add(*begin);
+    while(it != end) {
+        add(*it);
 
-        begin++;
+        it++;
     }
 }
 
+/* Returns the root of the tree */
 Node* AVL::getRoot() {
     return root;
 }
 
+/* Adds a node to the tree */
 bool AVL::add(string s) {
     Node* v = insert(root, nullptr, s);
     if (v == nullptr) {
         return false;
     }
-    //cout << v->getHeight() << endl;
     rebalance(v);
-    //cout << v->getHeight() << endl;
     size++;
     return true;
 }
@@ -350,7 +355,7 @@ bool AVL::rmv(string s) {
 }
 
 /* Search for the string s in the AVL tree recursively */
-Node* AVL::search(Node *current, string s) {
+Node* AVL::search(Node *current, string s) const {
     int compareResult;
     /* doesn't exists in the current tree */
     if (current == nullptr) {
@@ -372,13 +377,14 @@ Node* AVL::search(Node *current, string s) {
 }
 
 /* Checks if the AVL tree has a node with element s */
-bool AVL::contains(string s) {
+bool AVL::contains(string s) const {
     if (this->search(root, s) == nullptr) {
         return false;
     }
     return true;
 }
 
+/* Writes the tree to a file in a graphiz form */
 void AVL::print2DotFile(char *filename) {
     // open file
     ofstream graphFile(filename, ios::out | ios:: trunc);
@@ -390,11 +396,11 @@ void AVL::print2DotFile(char *filename) {
     graphFile << "digraph AVL {";
 
     // init iterator to parse the tree
-    Iterator begin, end;
-    begin = this->begin();
+    Iterator it, end;
+    it = this->begin();
     end = this->end();
-    while (begin != end) {
-        Node *tmp = begin.getCurrent();
+    while (it != end) {
+        Node *tmp = it.getCurrent();
         if (tmp->getLeft() != nullptr) {
             graphFile << tmp->getElement() << " -> ";
             graphFile << tmp->getLeft()->getElement() << ";\n";
@@ -407,19 +413,20 @@ void AVL::print2DotFile(char *filename) {
         if (root == tmp && tmp->getLeft() == nullptr && tmp->getRight() == nullptr) {
             graphFile << tmp->getElement() << ";\n";
         }
-        begin++;
+        it++;
     }
     graphFile << "}";
 }
 
+/* Writes the pre order iteration of the tree to a stream*/
 void AVL::pre_order(std::ostream& out) {
-    Iterator begin, end;
-    begin = this->begin();
+    Iterator it, end;
+    it = this->begin();
     end = this->end();
 
-    while(begin != end) {
-        out << *begin << " ";
-        begin++;
+    while(it != end) {
+        out << *it << " ";
+        it++;
     }
 }
 
@@ -540,28 +547,129 @@ void AVL::rebalance(Node *v) {
     }
 }
 
+/* Creates and returns an iterator of the tree */
 Iterator AVL::begin() const {
     Iterator it(root);
     return it;
 }
 
+/* Returns an empty iterator */
 Iterator AVL::end() const {
     Iterator it;
     return it;
 }
 
+/* Writes the pre order iteration of the tree to a stream*/
 std::ostream& operator<<(std::ostream& out, const AVL& tree) {
-    Iterator begin, end;
-    begin = tree.begin();
+    Iterator it, end;
+    it = tree.begin();
     end = tree.end();
 
-    while(begin != end) {
-        out << *begin << " ";
-        begin++;
+    while(it != end) {
+        out << *it << " ";
+        it++;
     }
     return out;
 }
 
+/* makes the current tree equal to the avl */
+AVL& AVL::operator=(const AVL& avl) {
+    queue<string> nodes;
+    Iterator it, end;
+    it = this->begin();
+    end = this->end();
+
+    // get the nodes of current tree that avl hasn't
+    while (it != end) {
+        if (!avl.contains(*it)) {
+            nodes.push(*it);
+        }
+        it++;
+    }
+
+    // delete the nodes from current tree
+    while (!nodes.empty()) {
+        this->rmv(nodes.front());
+        nodes.pop();
+    }
+
+    // get the nodes from avl which will add in the current tree
+    it = avl.begin();
+    end = avl.end();
+    while (it != end) {
+        if (!this->contains(*it)) {
+            nodes.push(*it);
+        }
+        it++;
+    }
+
+    // add the new nodes to the current tree
+    while (!nodes.empty()) {
+        this->add(nodes.front());
+        nodes.pop();
+    }
+    return *this;
+}
+
+/* merges two trees and returns a new tree */
+AVL AVL::operator+(const AVL& avl) {
+    AVL result;
+    Iterator it, end;
+    it = this->begin();
+    end = this->end();
+
+    while(it != end) {
+        result.add(*it);
+        it++;
+    }
+
+    it = avl.begin();
+    end = avl.end();
+
+    while(it != end) {
+        result.add(*it);
+        it++;
+    }
+    return result;
+}
+
+/* Add the nodes of the avl to the current tree */
+AVL& AVL::operator+=(const AVL& avl) {
+    Iterator it, end;
+    it = avl.begin();
+    end = avl.end();
+
+    while (it != end) {
+        this->add(*it);
+        it++;
+    }
+}
+
+/* Adds a node with the element e at the current tree */
+AVL& AVL::operator+=(const string& e) {
+    this->add(e);
+    return *this;
+}
+
+/* Removes a node with the element e at the current tree */
+AVL& AVL::operator-=(const string& e) {
+    this->rmv(e);
+    return *this;
+}
+
+/* Copies the current tree to a new and adds a node */
+AVL AVL::operator+(const string& e) {
+    AVL result(*this);
+    result.add(e);
+    return result;
+}
+
+/* Copies the current tree to a new and removes a node */
+AVL AVL::operator-(const string& e) {
+    AVL result(*this);
+    result.rmv(e);
+    return result;
+}
 
 int main() {
     AVL tree;
@@ -581,7 +689,16 @@ int main() {
     tree.add(f);
     tree.add(g);
 
-    AVL secondTree(tree);
+    AVL secondTree;
+    tree -= a;
+    tree -= g;
+    secondTree.add("18");
+    cout << tree << endl;
+    cout << "------" << endl;
+    cout << secondTree << endl;
     tree.add("17");
+    AVL thirdTree;
+    tree += secondTree;
+    cout << "------" << endl;
     cout << tree << endl;
 };
