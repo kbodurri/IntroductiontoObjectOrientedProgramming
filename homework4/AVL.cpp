@@ -218,6 +218,19 @@ AVL::AVL() {
     root = nullptr;
 };
 
+/* Copy constructor */
+AVL::AVL(AVL &copy) : AVL() {
+    Iterator begin, end;
+    begin = copy.begin();
+    end = copy.end();
+
+    while(begin != end) {
+        add(*begin);
+
+        begin++;
+    }
+}
+
 Node* AVL::getRoot() {
     return root;
 }
@@ -512,27 +525,21 @@ int main() {
     tree.add(f);
     tree.add(g);
 
+    AVL secondTree(tree);
+    tree.add("17");
     Iterator begin;
     Iterator end;
+    begin = tree.begin();
     end = tree.end();
-    begin = tree.begin();
     while(begin != end) {
         cout << *begin << endl;
         begin++;
     }
-    cout << "---------------" << endl;
-    tree.rmv(b);
-    begin = tree.begin();
+    cout << "----------" << endl;
+    begin = secondTree.begin();
+    end = secondTree.end();
     while(begin != end) {
         cout << *begin << endl;
         begin++;
     }
-    cout << "---------------" << endl;
-    tree.rmv(d);
-    begin = tree.begin();
-    while(begin != end) {
-        cout << *begin << endl;
-        begin++;
-    }
-    cout << "---------------" << endl;
 };
