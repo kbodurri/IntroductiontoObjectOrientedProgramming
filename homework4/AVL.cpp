@@ -121,74 +121,82 @@ bool Node::isBalanced() {
     return true;
 }
 
+Iterator::Iterator() {
+    current = nullptr;
+}
+
 Iterator::Iterator(Node *root) {
-    preOrder(root);
+    if (root != nullptr) {
+        nodeStack.push(root);
+        next();
+    }
 }
 
 Iterator::Iterator(Iterator &it) {
-    this->preOrderedQueue = it.getQueue();
+    current = it.getCurrent();
+    nodeStack = it.getStack();
 }
 
-/* Push the nodes of the tree into queue with pre order */
-void Iterator::preOrder(Node *root) {
-    stack<Node *> nodeStack;
-    nodeStack.push(root);
-
-    while(nodeStack.empty() == false) {
+/* Push the nodes of the tree into stack */
+void Iterator::next() {
+    if(hasNext()) {
         // remove the first item from the stack
-        Node *cur = nodeStack.top();
+        current = nodeStack.top();
         nodeStack.pop();
 
-        // add the curr to the queue (preOrder)
-        preOrderedQueue.push(cur);
-
         // push right and left (strickly in this order) child into the stack
-        if (cur->getRight() != nullptr) {
-            nodeStack.push(cur->getRight());
+        if (current->getRight() != nullptr) {
+            nodeStack.push(current->getRight());
         }
 
-        if (cur->getLeft() != nullptr) {
-            nodeStack.push(cur->getLeft());
+        if (current->getLeft() != nullptr) {
+            nodeStack.push(current->getLeft());
         }
     }
-
+    else {
+        current = nullptr;
+    }
 }
 
-/* Returns the pre-ordered queue */
-queue<Node *> Iterator::getQueue() {
-    return preOrderedQueue;
+/* Checks if any node left in pre ordered queue */
+bool Iterator::hasNext() {
+    return !nodeStack.empty();
 }
 
-/* Checks if the queue is empty */
-bool Iterator::isEmpty() {
-    return this->getQueue().empty();
+/* Returns the stack of unvisited nodes*/
+stack<Node *> Iterator::getStack() {
+    return nodeStack;
+}
+
+Node* Iterator::getCurrent() {
+    return current;
 }
 
 /* Increases the iterator by one */
 Iterator& Iterator::operator++() {
-    if (this->hasNext()) {
-        this->skip();
-    }
+    next();
     return *this;
 }
 
 /* Increases the iterator by one and return the previous one */
 Iterator Iterator::operator++(int a) {
     Iterator prevIt(*this);
-    if (this->hasNext()) {
-        this->skip();
-    }
+    next();
     return prevIt;
 }
 
 /* Returns the element of a node */
 string Iterator::operator*() {
-    return this->preOrderedQueue.front()->getElement();
+    return current->getElement();
 }
 
 /* Checks if the two iterators point at the different elements */
 bool Iterator::operator!=(Iterator it) {
-    if ((this->preOrderedQueue.front() != it.preOrderedQueue.front())) {
+    if (hasNext() == it.hasNext() && this->current == nullptr && it.getCurrent() == nullptr) {
+        return false;
+    }
+
+    if (current != it.getCurrent()) {
         return true;
     }
     return false;
@@ -196,23 +204,13 @@ bool Iterator::operator!=(Iterator it) {
 
 /* Checks if the two iterators point at the same element */
 bool Iterator::operator==(Iterator it) {
-    if ((this->preOrderedQueue.front() == it.preOrderedQueue.front())) {
+    if (hasNext() == it.hasNext() && this->current == nullptr && it.getCurrent() == nullptr) {
+        return true;
+    }
+    if (current == it.getCurrent()) {
         return true;
     }
     return false;
-}
-
-/* Checks if any node left in pre ordered queue */
-bool Iterator::hasNext() {
-    if (this->isEmpty()) {
-        return false;
-    }
-    return true;
-}
-
-/* Skips the next node from the pre ordered queue */
-void Iterator::skip() {
-    this->preOrderedQueue.pop();
 }
 
 AVL::AVL() {
@@ -229,7 +227,10 @@ bool AVL::add(string s) {
     if (v == nullptr) {
         return false;
     }
+    //cout << v->getHeight() << endl;
     rebalance(v);
+    //cout << v->getHeight() << endl;
+    size++;
     return true;
 }
 
@@ -248,10 +249,10 @@ Node* AVL::insert(Node *current, Node *previous, string s) {
             // allocation the new node and insert it as a leaf
             compareResult = previous->getElement().compare(s);
             newNode = new Node(s, previous, nullptr, nullptr);
-            if (compareResult > 0) { // as a right child
+            if (compareResult > 0) { // as a left child
                 previous->setLeft(newNode);
             }
-            else { // as a left child
+            else { // as a right child
                 previous->setRight(newNode);
             }
         }
@@ -269,6 +270,70 @@ Node* AVL::insert(Node *current, Node *previous, string s) {
     else {
         return this->insert(current->getRight(), current, s);
     }
+}
+
+Node* AVL::deleteNode(Node* current, string s) {
+    int compareResult;
+    Node* tmp = nullptr;
+    if (current == nullptr) {
+        return nullptr;
+    }
+
+    compareResult = current->getElement().compare(s);
+    if (compareResult > 0) { // search left subtree
+        current->setLeft(deleteNode(current->getLeft(), s));
+    }
+    else if (compareResult < 0) { // search right subtree
+        current->setRight(deleteNode(current->getRight(), s));
+    }
+    else { // found the node
+        if (current->getLeft() == nullptr || current->getRight() == nullptr) { // leaf or one-child
+            if (current->getLeft() == nullptr) {
+                tmp = current->getRight();
+            }
+            else {
+                tmp = current->getLeft();
+            }
+
+            if (tmp == nullptr) { // no children, is a leaf node
+                tmp = current;
+                current = nullptr;
+            }
+            else { // copy the non empty child
+                current->setElement(tmp->getElement());
+                current->setRight(tmp->getRight());
+                current->setLeft(tmp->getLeft());
+            }
+            if (tmp == root) {
+                root = nullptr;
+            }
+            delete tmp;
+        }
+        else {
+            for (Node *iterNode=current->getRight(); iterNode!=nullptr; iterNode = iterNode->getLeft()){
+                tmp = iterNode;
+            };
+
+            // copy the element
+            current->setElement(tmp->getElement());
+            current->setRight(deleteNode(current->getRight(), tmp->getElement()));
+        }
+    }
+
+    if (current == nullptr) {
+        return nullptr;
+    }
+    rebalance(current);
+    return current;
+}
+
+/* Remove a node from the tree */
+bool AVL::rmv(string s) {
+    Node *tmp = deleteNode(root, s);
+    if (tmp == nullptr) {
+        return true;
+    }
+    return false;
 }
 
 /* Search for the string s in the AVL tree recursively */
@@ -291,6 +356,14 @@ Node* AVL::search(Node *current, string s) {
     else {
         return this->search(current->getRight(), s);
     }
+}
+
+/* Checks if the AVL tree has a node with element s */
+bool AVL::contains(string s) {
+    if (this->search(root, s) == nullptr) {
+        return false;
+    }
+    return true;
 }
 
 /* Get the node which will participate in the rebalancing */
@@ -335,6 +408,9 @@ Node* AVL::singleRightRotation(Node *v, Node* w, Node* u) {
         root = w;
         w->setParent(nullptr);
     }
+    v->updateHeight();
+    w->updateHeight();
+    u->updateHeight();
     return w;
 }
 
@@ -360,6 +436,9 @@ Node *AVL::singleLeftRotation(Node *v, Node *w, Node *u) {
         root = w;
         w->setParent(nullptr);
     }
+    v->updateHeight();
+    w->updateHeight();
+    u->updateHeight();
     return w;
 }
 
@@ -404,118 +483,56 @@ void AVL::rebalance(Node *v) {
     }
 }
 
-/* Checks if the AVL tree has a node with element s */
-bool AVL::contains(string s) {
-    if (this->search(root, s) == nullptr) {
-        return false;
-    }
-    return true;
-}
-
-/* Remove a node from the tree */
-bool AVL::rmv(string s) {
-    Node *deletedNode = this->search(root, s);
-    Node *checkRebalance = nullptr;
-    if (deletedNode == nullptr) { // node not found
-        return false;
-    }
-
-    if (deletedNode->getRight() == nullptr && deletedNode->getLeft() == nullptr) { // delete a leaf node
-            if (root == deletedNode) {
-                root = nullptr;
-            }
-            checkRebalance = deletedNode->getParent();
-            if (deletedNode->isLeft()) { // update the parent of the leaf node
-                checkRebalance->setLeft(nullptr);
-            }
-            else {
-                checkRebalance->setRight(nullptr);
-            }
-            delete deletedNode;
-    }
-    else if (deletedNode->getRight() != nullptr && deletedNode->getLeft() != nullptr) {// has 2 children
-        Node *minRightSubtreeNode = nullptr;
-        Node *tmp = nullptr;
-
-        for (tmp=deletedNode->getRight(); tmp != nullptr; tmp=tmp->getLeft()) { // find min node of the right subtree
-            minRightSubtreeNode = tmp;
-        }
-
-
-        deletedNode->setElement(minRightSubtreeNode->getElement()); // exchange nodes
-        deletedNode->setRight(minRightSubtreeNode->getRight());
-        if (deletedNode->getRight() != nullptr) { // update parent
-            deletedNode->getRight()->setParent(deletedNode);
-        }
-        checkRebalance = deletedNode;
-        delete minRightSubtreeNode;
-    }
-    else if (deletedNode->getRight() == nullptr) {
-        checkRebalance = deletedNode->getLeft();
-        deletedNode->getLeft()->setParent(deletedNode->getParent());
-        if (deletedNode->getParent() != nullptr) {
-            if (deletedNode->isLeft()) { // update the parent
-                deletedNode->getParent()->setLeft(deletedNode->getLeft());
-            }
-            else {
-                deletedNode->getParent()->setRight(deletedNode->getLeft());
-            }
-        }
-        if (deletedNode == root) {
-            root = checkRebalance;
-        }
-        delete deletedNode;
-    }
-    else {
-        checkRebalance = deletedNode->getRight();
-        deletedNode->getRight()->setParent(deletedNode->getParent());
-        if (deletedNode->getParent() != nullptr) {
-            if (deletedNode->isLeft()) { // update the parent
-                deletedNode->getParent()->setLeft(deletedNode->getRight());
-            }
-            else {
-                deletedNode->getParent()->setRight(deletedNode->getRight());
-            }
-        }
-        if (deletedNode == root) {
-            root = checkRebalance;
-        }
-        delete deletedNode;
-    }
-    rebalance(checkRebalance);
-    return true;
-}
-
 Iterator AVL::begin() const {
-    Iterator *it = new Iterator(root);
-    return *it;
+    Iterator it(root);
+    return it;
 }
+
+Iterator AVL::end() const {
+    Iterator it;
+    return it;
+}
+
 
 int main() {
     AVL tree;
-    string a("15");
-    //string b("12");
-    string c("16");
-    //string d("14");
-    //string e("10");
-    //string f("19");
-    //string g("18");
+    string a("10");
+    string b("11");
+    string c("12");
+    string d("13");
+    string e("14");
+    string f("15");
+    string g("16");
 
     tree.add(a);
-    //tree.add(b);
+    tree.add(b);
     tree.add(c);
-    //tree.add(d);
-    //tree.add(e);
-    //tree.add(f);
-    //tree.add(g);
-    Iterator it(tree.getRoot());
+    tree.add(d);
+    tree.add(e);
+    tree.add(f);
+    tree.add(g);
 
-
-    cout << *it << endl;
-    it++;
-    cout << *it << endl;
-    cout << "Insertion is completed" << endl;
-    tree.rmv(a);
-    Iterator it2(tree.getRoot());
-    cout << *it2 << endl;
+    Iterator begin;
+    Iterator end;
+    end = tree.end();
+    begin = tree.begin();
+    while(begin != end) {
+        cout << *begin << endl;
+        begin++;
+    }
+    cout << "---------------" << endl;
+    tree.rmv(b);
+    begin = tree.begin();
+    while(begin != end) {
+        cout << *begin << endl;
+        begin++;
+    }
+    cout << "---------------" << endl;
+    tree.rmv(d);
+    begin = tree.begin();
+    while(begin != end) {
+        cout << *begin << endl;
+        begin++;
+    }
+    cout << "---------------" << endl;
 };

@@ -37,9 +37,11 @@ class Node {
 
 class Iterator {
     public:
+        Iterator();
         Iterator(Node *root);
         Iterator(Iterator &it);
-        queue<Node *> getQueue();
+        stack<Node *> getStack();
+        Node *getCurrent();
 
         Iterator& operator++();
         Iterator operator++(int a);
@@ -48,12 +50,12 @@ class Iterator {
         string operator*();
 
     private:
-        queue<Node *> preOrderedQueue;
+        Node *current;
+        stack<Node *> nodeStack;
 
-        void preOrder(Node *root);
         bool hasNext();
         bool isEmpty();
-        void skip();
+        void next();
 };
 
 class AVL {
@@ -71,10 +73,11 @@ class AVL {
         //~AVL();
 
         Iterator begin() const;
-        Iterator end();
+        Iterator end() const;
     private:
         Node* search(Node*, string);
         Node* insert(Node*, Node*, string);
+        Node* deleteNode(Node *, string);
         Node* rebalanceNode(Node*);
         void rebalance(Node*);
         Node* singleRightRotation(Node*, Node*, Node*);
