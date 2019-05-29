@@ -412,6 +412,17 @@ void AVL::print2DotFile(char *filename) {
     graphFile << "}";
 }
 
+void AVL::pre_order(std::ostream& out) {
+    Iterator begin, end;
+    begin = this->begin();
+    end = this->end();
+
+    while(begin != end) {
+        out << *begin << " ";
+        begin++;
+    }
+}
+
 /* Get the node which will participate in the rebalancing */
 Node* AVL::rebalanceNode(Node* v) {
     if (v->leftChildHeight() > v->rightChildHeight()) {
@@ -539,6 +550,18 @@ Iterator AVL::end() const {
     return it;
 }
 
+std::ostream& operator<<(std::ostream& out, const AVL& tree) {
+    Iterator begin, end;
+    begin = tree.begin();
+    end = tree.end();
+
+    while(begin != end) {
+        out << *begin << " ";
+        begin++;
+    }
+    return out;
+}
+
 
 int main() {
     AVL tree;
@@ -551,29 +574,14 @@ int main() {
     string g("16");
 
     tree.add(a);
-    //tree.add(b);
-    //tree.add(c);
-    //tree.add(d);
-    //tree.add(e);
-    //tree.add(f);
-    //tree.add(g);
+    tree.add(b);
+    tree.add(c);
+    tree.add(d);
+    tree.add(e);
+    tree.add(f);
+    tree.add(g);
 
     AVL secondTree(tree);
-    //tree.add("17");
-    tree.print2DotFile("avlTree.dot");
-    Iterator begin;
-    Iterator end;
-    begin = tree.begin();
-    end = tree.end();
-    while(begin != end) {
-        cout << *begin << endl;
-        begin++;
-    }
-    cout << "----------" << endl;
-    begin = secondTree.begin();
-    end = secondTree.end();
-    while(begin != end) {
-        cout << *begin << endl;
-        begin++;
-    }
+    tree.add("17");
+    cout << tree << endl;
 };

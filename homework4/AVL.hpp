@@ -65,11 +65,13 @@ class AVL {
     public:
         AVL();
         AVL(AVL&);
+        Node* getRoot();
         bool contains(string);
         bool add(string);
         bool rmv(string);
         void print2DotFile(char *filename);
-        Node* getRoot();
+        void pre_order(std::ostream&);
+        friend std::ostream& operator<<(std::ostream &, const AVL&);
         //~AVL();
 
         Iterator begin() const;
