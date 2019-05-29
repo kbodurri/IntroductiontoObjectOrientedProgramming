@@ -379,6 +379,39 @@ bool AVL::contains(string s) {
     return true;
 }
 
+void AVL::print2DotFile(char *filename) {
+    // open file
+    ofstream graphFile(filename, ios::out | ios:: trunc);
+    if (!graphFile.is_open()) {
+        cerr << "Error while opening file for writing." << endl;
+        graphFile.close();
+        exit(-1);
+    }
+    graphFile << "digraph AVL {";
+
+    // init iterator to parse the tree
+    Iterator begin, end;
+    begin = this->begin();
+    end = this->end();
+    while (begin != end) {
+        Node *tmp = begin.getCurrent();
+        if (tmp->getLeft() != nullptr) {
+            graphFile << tmp->getElement() << " -> ";
+            graphFile << tmp->getLeft()->getElement() << ";\n";
+        }
+        if (tmp->getRight() != nullptr) {
+            graphFile << tmp->getElement() << " -> ";
+            graphFile << tmp->getRight()->getElement() << ";\n";
+        }
+
+        if (root == tmp && tmp->getLeft() == nullptr && tmp->getRight() == nullptr) {
+            graphFile << tmp->getElement() << ";\n";
+        }
+        begin++;
+    }
+    graphFile << "}";
+}
+
 /* Get the node which will participate in the rebalancing */
 Node* AVL::rebalanceNode(Node* v) {
     if (v->leftChildHeight() > v->rightChildHeight()) {
@@ -518,15 +551,16 @@ int main() {
     string g("16");
 
     tree.add(a);
-    tree.add(b);
-    tree.add(c);
-    tree.add(d);
-    tree.add(e);
-    tree.add(f);
-    tree.add(g);
+    //tree.add(b);
+    //tree.add(c);
+    //tree.add(d);
+    //tree.add(e);
+    //tree.add(f);
+    //tree.add(g);
 
     AVL secondTree(tree);
-    tree.add("17");
+    //tree.add("17");
+    tree.print2DotFile("avlTree.dot");
     Iterator begin;
     Iterator end;
     begin = tree.begin();
