@@ -1,230 +1,16 @@
 #include "AVL.hpp"
-
-/* Constructor */
-Node::Node(const string& e, Node *parent, Node *left, Node *right) {
-    this->element = e;
-    this->parent = parent;
-    this->left = left;
-    this->right = right;
-    height = 1;
-}
-
-/* Get the parent of the node */
-Node *Node::getParent() const {
-    return parent;
-}
-
-/* Get the left child of the node */
-Node *Node::getLeft() const {
-    return left;
-}
-
-/* Get the right child of the node */
-Node *Node::getRight() const {
-    return right;
-}
-
-/* Get the element of the node */
-string Node::getElement() const {
-    return element;
-}
-
-/* Get the height of the node */
-int Node::getHeight() const {
-    return height;
-}
-
-/* Set the element of the node */
-void Node::setElement(string s) {
-    element = s;
-}
-
-/* Set the parent of the node */
-void Node::setParent(Node *parent) {
-    this->parent = parent;
-}
-
-/* Set the left child of the node */
-void Node::setLeft(Node *left) {
-    this->left = left;
-}
-
-/* Set the right child of the node */
-void Node::setRight(Node *right) {
-    this->right = right;
-}
-
-/* Check if the node is the left child of the parent */
-bool Node::isLeft() const {
-    // is the root
-    if (parent == nullptr) {
-        return false;
-    }
-
-    Node *l = parent->getLeft();
-    if (l == this) {
-        return true;
-    }
-    return false;
-}
-
-/* Check if the node is the right child of the parent */
-bool Node::isRight() const {
-    if (parent == nullptr) {
-        return false;
-    }
-
-    Node *r = parent->getRight();
-    if (r == this) {
-        return true;
-    }
-    return false;
-}
-
-/* Get the height of the left child */
-int Node::leftChildHeight() const {
-    if (left == nullptr) {
-        return 0;
-    }
-
-    return left->getHeight();
-}
-
-/* Get the height of the left child */
-int Node::rightChildHeight() const {
-    if (right == nullptr) {
-        return 0;
-    }
-    return right->getHeight();
-}
-
-/* Update the height of the node */
-int Node::updateHeight() {
-    int lHeight = leftChildHeight();
-    int rHeight = rightChildHeight();
-
-    /* new height is the max between right and left child + 1 */
-    if (lHeight > rHeight) {
-        height = lHeight + 1;
-    }
-    else {
-        height = rHeight + 1;
-    }
-    return height;
-}
-
-/* Checks if the node is balanced */
-bool Node::isBalanced() {
-    int balance = leftChildHeight() - rightChildHeight();
-    if (balance > 1 || balance < -1) {
-        return false;
-    }
-    return true;
-}
-
-/* Default Constructor */
-Iterator::Iterator() {
-    current = nullptr;
-}
-
-/* Constructor */
-Iterator::Iterator(Node *root) {
-    if (root != nullptr) {
-        nodeStack.push(root);
-        next();
-    }
-}
-
-/* Copy constructor */
-Iterator::Iterator(Iterator &it) {
-    current = it.getCurrent();
-    nodeStack = it.getStack();
-}
-
-/* Push the nodes of the tree into stack */
-void Iterator::next() {
-    if(hasNext()) {
-        // remove the first item from the stack
-        current = nodeStack.top();
-        nodeStack.pop();
-
-        // push right and left (strickly in this order) child into the stack
-        if (current->getRight() != nullptr) {
-            nodeStack.push(current->getRight());
-        }
-
-        if (current->getLeft() != nullptr) {
-            nodeStack.push(current->getLeft());
-        }
-    }
-    else {
-        current = nullptr;
-    }
-}
-
-/* Checks if any node left in pre ordered queue */
-bool Iterator::hasNext() {
-    return !nodeStack.empty();
-}
-
-/* Returns the stack of unvisited nodes*/
-stack<Node *> Iterator::getStack() {
-    return nodeStack;
-}
-
-Node* Iterator::getCurrent() {
-    return current;
-}
-
-/* Increases the iterator by one */
-Iterator& Iterator::operator++() {
-    next();
-    return *this;
-}
-
-/* Increases the iterator by one and return the previous one */
-Iterator Iterator::operator++(int a) {
-    Iterator prevIt(*this);
-    next();
-    return prevIt;
-}
-
-/* Returns the element of a node */
-string Iterator::operator*() {
-    return current->getElement();
-}
-
-/* Checks if the two iterators point at the different elements */
-bool Iterator::operator!=(Iterator it) {
-    if (hasNext() == it.hasNext() && this->current == nullptr && it.getCurrent() == nullptr) {
-        return false;
-    }
-
-    if (current != it.getCurrent()) {
-        return true;
-    }
-    return false;
-}
-
-/* Checks if the two iterators point at the same element */
-bool Iterator::operator==(Iterator it) {
-    if (hasNext() == it.hasNext() && this->current == nullptr && it.getCurrent() == nullptr) {
-        return true;
-    }
-    if (current == it.getCurrent()) {
-        return true;
-    }
-    return false;
-}
+#include "Node.cpp"
+#include "Iterator.cpp"
 
 /* Default constructor */
 AVL::AVL() {
     size = 0;
     root = nullptr;
+    parentFromDeleteChild = nullptr;
 };
 
 /* Copy constructor */
-AVL::AVL(AVL &copy) : AVL() {
+AVL::AVL(const AVL &copy) : AVL() {
     Iterator it, end;
     it = copy.begin();
     end = copy.end();
@@ -237,13 +23,13 @@ AVL::AVL(AVL &copy) : AVL() {
 }
 
 /* Returns the root of the tree */
-Node* AVL::getRoot() {
+AVL::Node* AVL::getRoot() {
     return root;
 }
 
 /* Adds a node to the tree */
 bool AVL::add(string s) {
-    Node* v = insert(root, nullptr, s);
+    AVL::Node* v = insert(root, nullptr, s);
     if (v == nullptr) {
         return false;
     }
@@ -253,20 +39,20 @@ bool AVL::add(string s) {
 }
 
 /* Insert a node to the tree recursively */
-Node* AVL::insert(Node *current, Node *previous, string s) {
+AVL::Node* AVL::insert(AVL::Node *current, AVL::Node *previous, string s) {
     int compareResult;
-    Node *newNode;
+    AVL::Node *newNode;
 
     // there is no node with element s, insert it to the tree
     if (current == nullptr) {
         if (root == nullptr) { // empty tree
-            newNode = new Node(s, nullptr, nullptr, nullptr);
+            newNode = new AVL::Node(s, nullptr, nullptr, nullptr);
             root = newNode;
         }
         else {
             // allocation the new node and insert it as a leaf
             compareResult = previous->getElement().compare(s);
-            newNode = new Node(s, previous, nullptr, nullptr);
+            newNode = new AVL::Node(s, previous, nullptr, nullptr);
             if (compareResult > 0) { // as a left child
                 previous->setLeft(newNode);
             }
@@ -290,9 +76,9 @@ Node* AVL::insert(Node *current, Node *previous, string s) {
     }
 }
 
-Node* AVL::deleteNode(Node* current, string s) {
+AVL::Node* AVL::deleteNode(AVL::Node* current, string s) {
     int compareResult;
-    Node* tmp = nullptr;
+    AVL::Node* tmp = nullptr;
     if (current == nullptr) {
         return nullptr;
     }
@@ -325,10 +111,11 @@ Node* AVL::deleteNode(Node* current, string s) {
             if (tmp == root) {
                 root = nullptr;
             }
+            parentFromDeleteChild = tmp->getParent();
             delete tmp;
         }
         else {
-            for (Node *iterNode=current->getRight(); iterNode!=nullptr; iterNode = iterNode->getLeft()){
+            for (AVL::Node *iterNode=current->getRight(); iterNode!=nullptr; iterNode = iterNode->getLeft()){
                 tmp = iterNode;
             };
 
@@ -341,21 +128,24 @@ Node* AVL::deleteNode(Node* current, string s) {
     if (current == nullptr) {
         return nullptr;
     }
-    rebalance(current);
     return current;
 }
 
 /* Remove a node from the tree */
 bool AVL::rmv(string s) {
-    Node *tmp = deleteNode(root, s);
+    AVL::Node *tmp = deleteNode(root, s);
     if (tmp == nullptr) {
         return true;
+    }
+    if (parentFromDeleteChild != nullptr) {
+        rebalance(parentFromDeleteChild);
+        parentFromDeleteChild = nullptr;
     }
     return false;
 }
 
 /* Search for the string s in the AVL tree recursively */
-Node* AVL::search(Node *current, string s) const {
+AVL::Node* AVL::search(Node *current, string s) const {
     int compareResult;
     /* doesn't exists in the current tree */
     if (current == nullptr) {
@@ -396,11 +186,11 @@ void AVL::print2DotFile(char *filename) {
     graphFile << "digraph AVL {";
 
     // init iterator to parse the tree
-    Iterator it, end;
+    AVL::Iterator it, end;
     it = this->begin();
     end = this->end();
     while (it != end) {
-        Node *tmp = it.getCurrent();
+        AVL::Node *tmp = it.getCurrent();
         if (tmp->getLeft() != nullptr) {
             graphFile << tmp->getElement() << " -> ";
             graphFile << tmp->getLeft()->getElement() << ";\n";
@@ -420,7 +210,7 @@ void AVL::print2DotFile(char *filename) {
 
 /* Writes the pre order iteration of the tree to a stream*/
 void AVL::pre_order(std::ostream& out) {
-    Iterator it, end;
+    AVL::Iterator it, end;
     it = this->begin();
     end = this->end();
 
@@ -431,7 +221,7 @@ void AVL::pre_order(std::ostream& out) {
 }
 
 /* Get the node which will participate in the rebalancing */
-Node* AVL::rebalanceNode(Node* v) {
+AVL::Node* AVL::rebalanceNode(AVL::Node* v) {
     if (v->leftChildHeight() > v->rightChildHeight()) {
         return v->getLeft();
     }
@@ -447,7 +237,7 @@ Node* AVL::rebalanceNode(Node* v) {
 }
 
 /* Apply a single right rotation */
-Node* AVL::singleRightRotation(Node *v, Node* w, Node* u) {
+AVL::Node* AVL::singleRightRotation(AVL::Node *v, AVL::Node* w, AVL::Node* u) {
     // first update the parents of the nodes
     if (v != root) {
         if (v->isLeft()) {
@@ -479,7 +269,7 @@ Node* AVL::singleRightRotation(Node *v, Node* w, Node* u) {
 }
 
 /* Apply a single left rotation */
-Node *AVL::singleLeftRotation(Node *v, Node *w, Node *u) {
+AVL::Node *AVL::singleLeftRotation(AVL::Node *v, AVL::Node *w, AVL::Node *u) {
     if (v != root) {
         if (v->isRight()) {
             v->getParent()->setRight(w);
@@ -507,22 +297,22 @@ Node *AVL::singleLeftRotation(Node *v, Node *w, Node *u) {
 }
 
 /* Apply a right rotation and then a left rotation */
-Node* AVL::doubleRightLeftRotation(Node *v, Node *w, Node *u) {
+AVL::Node* AVL::doubleRightLeftRotation(AVL::Node *v, AVL::Node *w, AVL::Node *u) {
     singleRightRotation(w, u, v);
     singleLeftRotation(v, u, w);
     return u;
 }
 
 /* Apply a right rotation and then a left rotation */
-Node* AVL::doubleLeftRightRotation(Node *v, Node *w, Node *u) {
+AVL::Node* AVL::doubleLeftRightRotation(AVL::Node *v, AVL::Node *w, AVL::Node *u) {
     singleLeftRotation(w, u, v);
     singleRightRotation(v, u, w);
     return u;
 }
 
-void AVL::rebalance(Node *v) {
-    Node *u=nullptr;
-    Node *w=nullptr;
+void AVL::rebalance(AVL::Node *v) {
+    AVL::Node *u=nullptr;
+    AVL::Node *w=nullptr;
 
     while(v != nullptr) { // iterate throught the whole tree
         v->updateHeight();
@@ -548,34 +338,36 @@ void AVL::rebalance(Node *v) {
 }
 
 /* Creates and returns an iterator of the tree */
-Iterator AVL::begin() const {
+AVL::Iterator AVL::begin() const {
     Iterator it(root);
     return it;
 }
 
 /* Returns an empty iterator */
-Iterator AVL::end() const {
+AVL::Iterator AVL::end() const {
     Iterator it;
     return it;
 }
 
 /* Writes the pre order iteration of the tree to a stream*/
 std::ostream& operator<<(std::ostream& out, const AVL& tree) {
-    Iterator it, end;
+    AVL::Iterator it, end;
     it = tree.begin();
     end = tree.end();
+
 
     while(it != end) {
         out << *it << " ";
         it++;
     }
+
     return out;
 }
 
 /* makes the current tree equal to the avl */
 AVL& AVL::operator=(const AVL& avl) {
     queue<string> nodes;
-    Iterator it, end;
+    AVL::Iterator it, end;
     it = this->begin();
     end = this->end();
 
@@ -614,7 +406,7 @@ AVL& AVL::operator=(const AVL& avl) {
 /* merges two trees and returns a new tree */
 AVL AVL::operator+(const AVL& avl) {
     AVL result;
-    Iterator it, end;
+    AVL::Iterator it, end;
     it = this->begin();
     end = this->end();
 
@@ -635,7 +427,7 @@ AVL AVL::operator+(const AVL& avl) {
 
 /* Add the nodes of the avl to the current tree */
 AVL& AVL::operator+=(const AVL& avl) {
-    Iterator it, end;
+    AVL::Iterator it, end;
     it = avl.begin();
     end = avl.end();
 
@@ -643,6 +435,7 @@ AVL& AVL::operator+=(const AVL& avl) {
         this->add(*it);
         it++;
     }
+    return *this;
 }
 
 /* Adds a node with the element e at the current tree */
@@ -653,6 +446,7 @@ AVL& AVL::operator+=(const string& e) {
 
 /* Removes a node with the element e at the current tree */
 AVL& AVL::operator-=(const string& e) {
+    //cout << e << endl;
     this->rmv(e);
     return *this;
 }
@@ -671,34 +465,13 @@ AVL AVL::operator-(const string& e) {
     return result;
 }
 
-int main() {
-    AVL tree;
-    string a("10");
-    string b("11");
-    string c("12");
-    string d("13");
-    string e("14");
-    string f("15");
-    string g("16");
+AVL::~AVL() {
+    AVL::Iterator it, end;
+    it = begin();
+    end = this->end();
 
-    tree.add(a);
-    tree.add(b);
-    tree.add(c);
-    tree.add(d);
-    tree.add(e);
-    tree.add(f);
-    tree.add(g);
-
-    AVL secondTree;
-    tree -= a;
-    tree -= g;
-    secondTree.add("18");
-    cout << tree << endl;
-    cout << "------" << endl;
-    cout << secondTree << endl;
-    tree.add("17");
-    AVL thirdTree;
-    tree += secondTree;
-    cout << "------" << endl;
-    cout << tree << endl;
-};
+    while (it != end) {
+        delete it.getCurrent();
+        it++;
+    }
+}
