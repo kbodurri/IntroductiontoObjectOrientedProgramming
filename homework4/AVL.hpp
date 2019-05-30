@@ -56,7 +56,6 @@ class AVL {
             public:
                 Iterator();
                 Iterator(Node*);
-                Iterator(const Iterator&);
                 stack<Node *> getStack() const;
                 Node *getCurrent() const;
 
