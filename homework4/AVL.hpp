@@ -41,6 +41,7 @@ class AVL {
         Node* root;
         Node* parentFromDeleteChild;
 
+        void freeAVL();
         Node* search(Node*, string) const;
         Node* insert(Node*, Node*, string);
         Node* deleteNode(Node *, string);
@@ -79,7 +80,7 @@ class AVL {
         bool contains(string) const;
         bool add(string);
         bool rmv(string);
-        void print2DotFile(char*);
+        void print2DotFile(char*) const;
         void pre_order(std::ostream&);
         friend std::ostream& operator<<(std::ostream &, const AVL&);
         AVL& operator=(const AVL&);

@@ -1,6 +1,227 @@
+/*
+ * AVL trees functionality (insert, delete, search)
+ *
+ * Contributors: Klajdi Bodurri && Eirini Tsitsopoulou.
+*/
 #include "AVL.hpp"
-#include "Node.cpp"
-#include "Iterator.cpp"
+
+/* Constructor */
+AVL::Node::Node(const string& e, AVL::Node *parent, AVL::Node *left, AVL::Node *right) {
+    this->element = e;
+    this->parent = parent;
+    this->left = left;
+    this->right = right;
+    height = 1;
+}
+
+/* Get the parent of the node */
+AVL::Node *AVL::Node::getParent() const {
+    return parent;
+}
+
+/* Get the left child of the node */
+AVL::Node *AVL::Node::getLeft() const {
+    return left;
+}
+
+/* Get the right child of the node */
+AVL::Node *AVL::Node::getRight() const {
+    return right;
+}
+
+/* Get the element of the node */
+string AVL::Node::getElement() const {
+    return element;
+}
+
+/* Get the height of the node */
+int AVL::Node::getHeight() const {
+    return height;
+}
+
+/* Set the element of the node */
+void AVL::Node::setElement(string s) {
+    element = s;
+}
+
+/* Set the parent of the node */
+void AVL::Node::setParent(AVL::Node *parent) {
+    this->parent = parent;
+}
+
+/* Set the left child of the node */
+void AVL::Node::setLeft(AVL::Node *left) {
+    this->left = left;
+}
+
+/* Set the right child of the node */
+void AVL::Node::setRight(AVL::Node *right) {
+    this->right = right;
+}
+
+/* Check if the node is the left child of the parent */
+bool AVL::Node::isLeft() const {
+    // is the root
+    if (parent == nullptr) {
+        return false;
+    }
+
+    AVL::Node *l = parent->getLeft();
+    if (l == this) {
+        return true;
+    }
+    return false;
+}
+
+/* Check if the node is the right child of the parent */
+bool AVL::Node::isRight() const {
+    if (parent == nullptr) {
+        return false;
+    }
+
+    AVL::Node *r = parent->getRight();
+    if (r == this) {
+        return true;
+    }
+    return false;
+}
+
+/* Get the height of the left child */
+int AVL::Node::leftChildHeight() const {
+    if (left == nullptr) {
+        return 0;
+    }
+
+    return left->getHeight();
+}
+
+/* Get the height of the left child */
+int AVL::Node::rightChildHeight() const {
+    if (right == nullptr) {
+        return 0;
+    }
+    return right->getHeight();
+}
+
+/* Update the height of the node */
+int AVL::Node::updateHeight() {
+    int lHeight = leftChildHeight();
+    int rHeight = rightChildHeight();
+
+    /* new height is the max between right and left child + 1 */
+    if (lHeight > rHeight) {
+        height = lHeight + 1;
+    }
+    else {
+        height = rHeight + 1;
+    }
+    return height;
+}
+
+/* Checks if the node is balanced */
+bool AVL::Node::isBalanced() {
+    int balance = leftChildHeight() - rightChildHeight();
+    if (balance > 1 || balance < -1) {
+        return false;
+    }
+    return true;
+}
+
+/*
+ * Iterator class, used for AVL trees.
+ *
+ * Contributors: Klajdi Bodurri && Eirini Tsitsopoulou.
+*/
+
+/* Default Constructor */
+AVL::Iterator::Iterator() {
+    current = nullptr;
+}
+
+/* Constructor */
+AVL::Iterator::Iterator(AVL::Node *root) {
+    current = nullptr;
+    if (root != nullptr) {
+        nodeStack.push(root);
+        next();
+    }
+}
+
+/* Push the nodes of the tree into stack */
+void AVL::Iterator::next() {
+    if(hasNext()) {
+        // remove the first item from the stack
+        current = nodeStack.top();
+        nodeStack.pop();
+
+        // push right and left (strickly in this order) child into the stack
+        if (current->getRight() != nullptr) {
+            nodeStack.push(current->getRight());
+        }
+
+        if (current->getLeft() != nullptr) {
+            nodeStack.push(current->getLeft());
+        }
+    }
+    else {
+        current = nullptr;
+    }
+}
+
+/* Checks if any node left in pre ordered queue */
+bool AVL::Iterator::hasNext() {
+    return !nodeStack.empty();
+}
+
+/* Returns the stack of unvisited nodes*/
+stack<AVL::Node *> AVL::Iterator::getStack() const {
+    return nodeStack;
+}
+
+AVL::Node* AVL::Iterator::getCurrent() const {
+    return current;
+}
+
+/* Increases the iterator by one */
+AVL::Iterator& AVL::Iterator::operator++() {
+    next();
+    return *this;
+}
+
+/* Increases the iterator by one and return the previous one */
+AVL::Iterator AVL::Iterator::operator++(int a) {
+    AVL::Iterator prevIt(*this);
+    next();
+    return prevIt;
+}
+
+/* Returns the element of a node */
+string AVL::Iterator::operator*() {
+    return current->getElement();
+}
+
+/* Checks if the two iterators point at the different elements */
+bool AVL::Iterator::operator!=(AVL::Iterator it) {
+    if (hasNext() == it.hasNext() && current == nullptr && it.getCurrent() == nullptr) {
+        return false;
+    }
+
+    if (current != it.getCurrent()) {
+        return true;
+    }
+    return false;
+}
+
+/* Checks if the two iterators point at the same element */
+bool AVL::Iterator::operator==(AVL::Iterator it) {
+    if (hasNext() == it.hasNext() && current == nullptr && it.getCurrent() == nullptr) {
+        return true;
+    }
+    if (current == it.getCurrent()) {
+        return true;
+    }
+    return false;
+}
 
 /* Default constructor */
 AVL::AVL() {
@@ -17,7 +238,6 @@ AVL::AVL(const AVL &copy) : AVL() {
 
     while(it != end) {
         add(*it);
-
         it++;
     }
 }
@@ -175,7 +395,7 @@ bool AVL::contains(string s) const {
 }
 
 /* Writes the tree to a file in a graphiz form */
-void AVL::print2DotFile(char *filename) {
+void AVL::print2DotFile(char *filename) const {
     // open file
     ofstream graphFile(filename, ios::out | ios:: trunc);
     if (!graphFile.is_open()) {
@@ -366,39 +586,19 @@ std::ostream& operator<<(std::ostream& out, const AVL& tree) {
 
 /* makes the current tree equal to the avl */
 AVL& AVL::operator=(const AVL& avl) {
-    queue<string> nodes;
     AVL::Iterator it, end;
     it = this->begin();
     end = this->end();
 
-    // get the nodes of current tree that avl hasn't
-    while (it != end) {
-        if (!avl.contains(*it)) {
-            nodes.push(*it);
-        }
-        it++;
-    }
+    // remove all nodes from current tree
+    freeAVL();
 
-    // delete the nodes from current tree
-    while (!nodes.empty()) {
-        this->rmv(nodes.front());
-        nodes.pop();
-    }
-
-    // get the nodes from avl which will add in the current tree
+    // add all the nodes from avl to the current tree
     it = avl.begin();
     end = avl.end();
     while (it != end) {
-        if (!this->contains(*it)) {
-            nodes.push(*it);
-        }
+        this->add(*it);
         it++;
-    }
-
-    // add the new nodes to the current tree
-    while (!nodes.empty()) {
-        this->add(nodes.front());
-        nodes.pop();
     }
     return *this;
 }
@@ -465,13 +665,20 @@ AVL AVL::operator-(const string& e) {
     return result;
 }
 
-AVL::~AVL() {
+void AVL::freeAVL() {
     AVL::Iterator it, end;
-    it = begin();
+    it = this->begin();
     end = this->end();
 
     while (it != end) {
         delete it.getCurrent();
         it++;
     }
+    size = 0;
+    root = nullptr;
+    parentFromDeleteChild = nullptr;
+}
+
+AVL::~AVL() {
+    freeAVL();
 }
