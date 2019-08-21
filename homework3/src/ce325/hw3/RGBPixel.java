@@ -1,0 +1,108 @@
+/*
+ * Describes a pixel (RGB).
+ */
+package ce325.hw3;
+
+/**
+ *
+ * @author klajdi bodurri && eirini tsitsopoulou
+ */
+public class RGBPixel {
+    private int pixel = 0;
+    
+    /* Saves the pixel based on red, green and blue numbers */
+    public RGBPixel(short red, short green, short blue) {
+        pixel = pixel | (red<<16) | (green << 8) | blue;
+    }
+    
+    /* Copies the value of the given pixel to pixel */
+    public RGBPixel(RGBPixel pixel) {
+        this(pixel.getRed(), pixel.getGreen(), pixel.getBlue());
+    }
+    
+    public RGBPixel(YUVPixel pixel) {
+        YUVtoRGB(pixel);
+    }
+    
+    /* Returns the red value of the pixel */
+    public short getRed() {
+        short value = (short)((pixel & (255<<16))>> 16);
+        return value;
+    }
+    
+    /* Set the new red value to the pixel */
+    public void setRed(short red) {
+        pixel = (pixel & 0xFF00FFFF) | (red << 16);
+    }
+    
+    /* Returns the green value of the pixel */
+    public short getGreen() {
+        short value = (short)((pixel & (255<<8))>>8);
+        return value;
+    }
+    
+    /* Set the new green value to the pixel */
+    public void setGreen(short green) {
+        pixel = (pixel & 0xFFFF00FF) | (green << 8);
+    }
+
+    /* Returns the blue value of the pixel */
+    public short getBlue() {
+        short value = (short)(pixel & 255);
+        return value;
+    }
+
+    /* Set the new blue value to the pixel */
+    public void setBlue(short blue) {
+        pixel = (pixel & 0xFFFFFF00) | blue;
+    }
+    
+    /* Returns the value of the pixel */
+    public int getRGB() {
+        return pixel;
+    }
+    
+    /* Sets a value to the pixel */
+    public void setRGB(int value) {
+        pixel = (value & 0x00FFFFFF);
+    }
+    
+    /* Sets the colours to the pixel */
+    public final void setRGB(short red, short green, short blue) {
+        setRed(red);
+        setGreen(green);
+        setBlue(blue);
+    }
+    
+    /* Returns the RGB values as string */
+    public String toString() {
+        return "("+getRed()+","+getGreen()+","+getBlue()+")";
+    }
+    
+    /* Converts a YUV pixel to RGB. */
+    private void YUVtoRGB(YUVPixel pixel) {
+        short red, green, blue;
+        int C, D, E;
+        
+        C = pixel.getY() - 16;
+        D = pixel.getU() - 128;
+        E = pixel.getV() - 128;
+        
+        red = clip((298 * C + 409 * E + 128) >> 8);
+        green = clip((298 * C - 100 * D - 208 * E + 128) >> 8);
+        blue = clip((298 * C + 516 * D + 128) >> 8);
+        setRed(red);
+        setGreen(green);
+        setBlue(blue);
+    }
+    
+    private short clip(int number) {
+        if (number < 0) {
+            return 0;
+        } 
+        else if (number > 255) {
+            return 255;
+        }
+        return (short) number;
+    }
+}
